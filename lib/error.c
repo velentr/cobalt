@@ -23,6 +23,9 @@ static const char *co_strerror_priv(int errnum)
 	case CO_EINCOMPLETE:
 		ret = "Incomplete write detected";
 		break;
+	case CO_EABORT:
+		ret = "Operation aborted";
+		break;
 	default:
 		ret = "Unknown error";
 		break;

@@ -323,7 +323,7 @@ static int co_db_run_opcode(struct co_db *db, const struct co_db_op * const op)
 {
 	int rc;
 
-	assert(op->type < CO_DB_NOPS);
+	assert(op->type < CO_DB_NUM_OPS);
 
 	switch (op->type) {
 	case CO_DB_DIR_EXIST:
@@ -359,6 +359,9 @@ static int co_db_run_opcode(struct co_db *db, const struct co_db_op * const op)
 	case CO_DB_QUERY_MAP:
 		rc = co_db_query_map_run(db);
 		break;
+	case CO_DB_ABORT:
+		rc = CO_EABORT;
+		break;
 	default:
 		rc = CO_ENOERR;
 		break;
@@ -373,7 +376,7 @@ static int co_db_run_opcode(struct co_db *db, const struct co_db_op * const op)
 static void co_db_revert_opcode(struct co_db *db,
 		const struct co_db_op * const op)
 {
-	assert(op->type < CO_DB_NOPS);
+	assert(op->type < CO_DB_NUM_OPS);
 
 	switch (op->type) {
 	case CO_DB_DIR_CREATE:
@@ -396,6 +399,9 @@ static void co_db_revert_opcode(struct co_db *db,
 		break;
 	case CO_DB_QUERY_LOAD:
 		co_db_query_load_revert(db);
+		break;
+	case CO_DB_ABORT:
+		assert(0);
 		break;
 	default:
 		break;

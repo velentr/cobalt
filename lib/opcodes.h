@@ -19,7 +19,9 @@ typedef enum {
 	CO_DB_QUERY_READ,
 	CO_DB_QUERY_MAP,
 	CO_DB_QUERY_BOARD,
-	CO_DB_NOPS
+	CO_DB_NOP,
+	CO_DB_ABORT,
+	CO_DB_NUM_OPS
 } co_opcode_t;
 
 struct co_db_op {
@@ -54,6 +56,10 @@ struct co_db_op {
 	{ .type = CO_DB_QUERY_MAP, }
 #define OP_QBD \
 	{ .type = CO_DB_QUERY_BOARD, }
+#define OP_NOP \
+	{ .type = CO_DB_NOP, }
+#define OP_ABORT \
+	{ .type = CO_DB_ABORT, }
 
 /* macros providing some syntactic sugar for common operations */
 #define MACRO_SCATL(dst, src) OP_SCAT(dst, src, strlen(src))
