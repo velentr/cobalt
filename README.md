@@ -5,6 +5,17 @@ lists. All tasks are identified by a unique 32-bit identifier (represented as an
 8 character hex string) and are grouped according to "boards". Each task is
 composed of a short description.
 
+## Dependencies
+There are no runtime dependencies (besides a C library).
+
+### Build-time
+ - ragel FSM compiler
+ - GCC-compatible C compiler
+ - GNU make
+
+### Tests
+ - Perl (any version should work)
+
 ## Building
 
 To build, first install the necessary dependencies: the ragel FSM compiler, a
