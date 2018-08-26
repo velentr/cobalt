@@ -1,3 +1,11 @@
 *.o
 *.d
+*.s
+*.test
 .*
+*_parse.c
+/cobalt
+*.so
+*.gcno
+*.gcda
+*.gcov
