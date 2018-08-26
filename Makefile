@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS += -fpic -Wall -Wextra -std=gnu99 -Iinclude -I. -fvisibility=hidden
+CFLAGS += -fpic -Wall -Wextra -std=gnu99 -Iinclude -I. -Ilib -fvisibility=hidden
 DFLAGS += -MMD
 
 LDFLAGS += -L.
@@ -15,7 +15,7 @@ cgen :=
 test :=
 cover :=
 
-sub := cli lib test
+sub := cli lib lib/test test
 
 include $(sub:=/src.mk)
 include src.mk
@@ -71,8 +71,8 @@ $(lib): $(libobj) $(obj)
 	@echo "ASM	$*"
 	$(CC) $(CFLAGS) $(CFLAGS_$*) -S $< -o $@
 
-%.test: %.o $(testlib:=.o) $(obj)
-	@echo "TEST	$*"
+%.test: %.o $(testlib:=.o) $(obj) $(libobj)
+	@echo "LD	$*"
 	$(CC) $^ -o $@ $(LDFLAGS_test) $(LDFLAGS)
 
 clean:

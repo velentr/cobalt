@@ -77,6 +77,8 @@ static int co_db_file_create_run(struct co_db *db, const struct co_db_op *op)
 		ret = CO_ENOERR;
 
 	close(fd);
+	if (ret != CO_ENOERR)
+		unlink(dstr(&db->str[op->str0]));
 
 	return ret;
 }

@@ -7,6 +7,7 @@
 
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <cobalt/cobalt_error.h>
 
