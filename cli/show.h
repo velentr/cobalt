@@ -8,8 +8,8 @@
 
 struct show_cmd {
 	const char *board;
+	const char *format;
 	int noboard;
-	int longf;
 };
 
 int show_parse(int argc, const char *argv[], struct show_cmd *cmd);

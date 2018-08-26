@@ -27,15 +27,20 @@
 	}
 
 	action setlong {
-		cmd->longf = 1;
+		cmd->format = "%i\n%l\n";
+	}
+
+	action setformat {
+		cmd->format = arg;
 	}
 
 	board = '@' [^\0/]+;
 	noboard = ("--no-board" | "-n");
 	long = ("--long" | "-l");
+	format = ( "--format\0" | "-f\0" ) [^\0]+;
 
-	main := (( board %setboard | noboard %setnoboard | long %setlong )
-			      '\0' )+;
+	main := (( board %setboard | noboard %setnoboard | long %setlong |
+			format %setformat ) '\0' )+;
 }%%
 
 int show_parse(int argc, const char *argv[], struct show_cmd *cmd)
@@ -45,8 +50,8 @@ int show_parse(int argc, const char *argv[], struct show_cmd *cmd)
 	int cs;
 
 	cmd->board = NULL;
+	cmd->format = "  %i  %s\n";
 	cmd->noboard = 0;
-	cmd->longf = 0;
 
 	%% write init;
 

@@ -16,7 +16,8 @@
 
 static void show_usage(void)
 {
-	uprint("cobalt show [--long|-l] [--no-board|-n] @<board>\n");
+	uprint("cobalt show [--format|-f <format>] [--long|-l] [--no-board|-n]"
+			" @<board>\n");
 }
 
 static void show_usage_long(void)
@@ -24,36 +25,80 @@ static void show_usage_long(void)
 	show_usage();
 	fprintf(stderr, "\n");
 	fprintf(stderr, "options:\n");
+	fprintf(stderr, "\t--format|-f <format>\n");
+	fprintf(stderr, "\t\t\tprint output according to <format>\n");
 	fprintf(stderr, "\t--long|-l\tprint the full task data\n");
 	fprintf(stderr, "\t--no-board|-n\tdo not print the board name\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "arguments:\n");
 	fprintf(stderr, "\t<board>\t\tboard to show all tasks from\n");
 }
-
-static void show_print_task(struct show_cmd *cmd, struct cobalt_query *q)
+static void show_printf(const char *fmt, struct cobalt_query *task)
 {
+	enum { NORMAL, FORMAT, ESCAPE } state;
 	const char *data;
+	const char *end;
 	size_t len;
-	const char *endp;
-	uint32_t id;
 
-	co_query_getdata(q, &data, &len);
-	id = co_query_getid(q);
-
-	if (cmd->longf) {
-		printf("%08x\n", id);
-		fwrite(data, sizeof(*data), len, stdout);
-		printf("\n");
-	} else {
-		printf("  %08x  ", id);
-
-		endp = memchr(data, '\n', len);
-		if (endp == NULL) {
-			fwrite(data, sizeof(*data), len, stdout);
-			putchar('\n');
-		} else {
-			fwrite(data, sizeof(*data), endp - data + 1, stdout);
+	co_query_getdata(task, &data, &len);
+	for (state = NORMAL; *fmt != '\0'; fmt++) {
+		switch (state) {
+		case NORMAL:
+			switch (*fmt) {
+			case '%':
+				state = FORMAT;
+				break;
+			case '\\':
+				state = ESCAPE;
+				break;
+			default:
+				putchar(*fmt);
+				break;
+			}
+			break;
+		case FORMAT:
+			switch (*fmt) {
+			case 'i':
+				printf("%08x", co_query_getid(task));
+				break;
+			case 'l':
+				fwrite(data, 1, len, stdout);
+				break;
+			case 's':
+				end = memchr(data, '\n', len);
+				if (end == NULL)
+					fwrite(data, 1, len, stdout);
+				else
+					fwrite(data, 1, end - data, stdout);
+				break;
+			default:
+				putchar('%');
+				putchar(*fmt);
+				break;
+			}
+			state = NORMAL;
+			break;
+		case ESCAPE:
+			switch (*fmt) {
+			case '0':
+				putchar('\0');
+				break;
+			case 'n':
+				putchar('\n');
+				break;
+			case 'r':
+				putchar('\r');
+				break;
+			case 't':
+				putchar('\t');
+				break;
+			case '\\':
+			default:
+				putchar(*fmt);
+				break;
+			}
+			state = NORMAL;
+			break;
 		}
 	}
 }
@@ -73,7 +118,7 @@ static int show_main(int argc, const char *argv[])
 	}
 
 	if (cmd.board == NULL) {
-		eprint("must supply board to show from");
+		eprint("must supply board to show from\n");
 		return EXIT_FAILURE;
 	}
 
@@ -91,7 +136,7 @@ static int show_main(int argc, const char *argv[])
 			printf("@%s\n", cmd.board);
 
 		for (; q != NULL; q = co_query_getnext(co, q))
-			show_print_task(&cmd, q);
+			show_printf(cmd.format, q);
 	} else {
 		eprint("cannot query database: %s\n", co_strerror(co));
 		rc = EXIT_FAILURE;

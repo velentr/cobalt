@@ -5,6 +5,10 @@ All changes between releases will be documented in this file.
 ### Added
  - Man page for `cobalt` command using `asciidoc(1)`, along with `Makefile`
    changes to build documentation.
+ - Added `printf(3)`-style format string argument to `show` command.
+
+### Fixed
+ - Added newline to the end of `show` error message.
 
 ## 0.0.1 (2018/08/27)
 ### Added
