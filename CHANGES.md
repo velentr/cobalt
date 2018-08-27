@@ -1,7 +1,7 @@
 # Changelog
 All changes between releases will be documented in this file.
 
-## [Unreleased]
+## 0.0.1 (2018/08/27)
 ### Added
  - Initial changelog based on [Keep a
    Changelog](http://keepachangelog.com/en/1.0.0/).
