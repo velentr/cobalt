@@ -1,6 +1,11 @@
 # Changelog
 All changes between releases will be documented in this file.
 
+## Unreleased
+### Added
+ - Man page for `cobalt` command using `asciidoc(1)`, along with `Makefile`
+   changes to build documentation.
+
 ## 0.0.1 (2018/08/27)
 ### Added
  - Initial changelog based on [Keep a

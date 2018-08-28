@@ -9,3 +9,4 @@
 *.gcno
 *.gcda
 *.gcov
+*.[0-9]

@@ -12,9 +12,8 @@ There are no runtime dependencies (besides a C library).
  - ragel FSM compiler
  - GCC-compatible C compiler
  - GNU make
-
-### Tests
- - Perl (any version should work)
+ - Perl 5 (for running tests)
+ - Asciidoc (for building documentation)
 
 ## Building
 

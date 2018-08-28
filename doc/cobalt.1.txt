@@ -1,0 +1,63 @@
+COBALT(1)
+=========
+:doctype: manpage
+
+NAME
+----
+cobalt - personal todo tracker
+
+SYNOPSIS
+--------
+*cobalt* '<command>' ['options'] ...
+
+DESCRIPTION
+-----------
+Cobalt is a tool for managing personal task lists using plain-text files. All
+tasks are identified by a 32-bit (8 character) hex string and are organized into
+boards: each task is a member of exactly one board.
+
+Boards act as an index into the task database, so all tasks on a particular
+board can be accessed quickly. Each task is represented by a plain-text data
+file that can be edited by the user.
+
+To get started, read the command section below; to view the options for a
+particular command, run 'cobalt help <command>'.
+
+COMMANDS
+--------
+*add*::
+	Add a new task to the database. The task's board must be specified on
+	the command line, and the user's editor will be opened to write the data
+	for the task. A random ID will be chosen for the new task.
+
+*help*::
+	Print usage general usage information about 'cobalt', or usage
+	information about a specific command.
+
+*init*::
+	Initialize an empty 'cobalt' database in the current directory. This
+	must be run before any other commands.
+
+*modify*::
+	Modify attributes and data for a particular task. The task must be
+	identified by its ID. Use this command to change which board it is on,
+	modify the text of the task, or delete the task altogether.
+
+*show*::
+	Show information about tasks in the database. All queries are run based
+	on an index, which may be a board or some other attribute. The data
+	shown for each task may be customized for easier scripting.
+
+*version*::
+	Print version information about the 'cobalt' installation.
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:

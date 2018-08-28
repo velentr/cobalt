@@ -7,6 +7,9 @@ LDFLAGS += -L.
 RL ?= ragel
 RLFLAGS += -C
 
+A2X ?= a2x
+DOCFLAGS += -f manpage -d manpage -L
+
 GCOV ?= gcov
 
 # shared variables need immediate assignment since $(dir) will change between
@@ -14,8 +17,9 @@ GCOV ?= gcov
 cgen :=
 test :=
 cover :=
+doc :=
 
-sub := cli lib lib/test test
+sub := cli doc lib lib/test test
 
 include $(sub:=/src.mk)
 include src.mk
@@ -49,6 +53,8 @@ cover: LDFLAGS += -lgcov
 cover: clean test
 	$(GCOV) $(cover)
 
+doc: $(doc)
+
 -include $(dep) $(clidep) $(libdep) $(testdep)
 
 $(cli): $(cliobj) $(obj) | $(lib)
@@ -78,11 +84,17 @@ $(lib): $(libobj) $(obj)
 clean:
 	@echo cleaning...
 	rm -f $(cliobj) $(clidep) $(clisrc) $(cli) $(lib) $(libobj) $(libdep) \
-		$(obj) $(dep) $(testobj) $(testdep) $(testbin)
+		$(obj) $(dep) $(testobj) $(testdep) $(testbin) $(doc)
 	find -type f \( -name '*.gcda' -o -name '*.gcno' -o -name '*.gcov' \) \
 		-exec rm {} +
 
-.PHONY: all clean cover test
+# need the second expansion here to reference $@ in the prerequisite list
+.SECONDEXPANSION:
+$(doc): $$@.txt $(docconf)
+	@echo "DOC	$@"
+	$(A2X) $(DOCFLAGS) $<
+
+.PHONY: all clean cover doc test
 
 # disable automatic rules
 .SUFFIXES:
