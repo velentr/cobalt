@@ -22,10 +22,19 @@
 		}
 	}
 
-	board = '@' [^\0/]+;
-	path = ("--path\0" | "-p\0") [^\0]+;
+	action setmessage {
+		if (cmd->message == NULL) {
+			cmd->message = arg;
+		} else {
+			eprint("may only specify message once\n");
+			return -1;
+		}
+	}
 
-	main := (( board %setboard | path ) '\0' )+;
+	board = '@' [^\0/]+;
+	message = ( "--message\0" | "-m\0" ) [^\0]+;
+
+	main := (( board %setboard | message %setmessage ) '\0' )+;
 }%%
 
 int add_parse(int argc, const char *argv[], struct add_cmd *cmd)
@@ -36,6 +45,7 @@ int add_parse(int argc, const char *argv[], struct add_cmd *cmd)
 
 	cmd->board = NULL;
 	cmd->path = NULL;
+	cmd->message = NULL;
 
 	%% write init;
 

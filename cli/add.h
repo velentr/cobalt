@@ -9,6 +9,7 @@
 struct add_cmd {
 	const char *board;
 	const char *path;
+	const char *message;
 };
 
 int add_parse(int argc, const char *argv[], struct add_cmd *cmd);

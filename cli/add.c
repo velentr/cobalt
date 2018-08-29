@@ -16,12 +16,16 @@
 
 static void add_usage(void)
 {
-	uprint("cobalt add @<board>\n");
+	uprint("cobalt add [--message|-m <message>] @<board>\n");
 }
 
 static void add_usage_long(void)
 {
 	add_usage();
+	fprintf(stderr, "\n");
+	fprintf(stderr, "options:\n");
+	fprintf(stderr, "\t--message|-m <message>\n");
+	fprintf(stderr, "\t\tuse <message> as the data for the new task\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "arguments:\n");
 	fprintf(stderr, "\t<board>\tboard to which the task is added\n");
@@ -32,6 +36,8 @@ static int add_main(int argc, const char *argv[])
 	struct dstring data = DSTR_EMPTY;
 	struct add_cmd cmd;
 	struct cobalt *co;
+	const char *message;
+	size_t len;
 	uint32_t id;
 	int err;
 	int rc;
@@ -53,16 +59,24 @@ static int add_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	rc = editstr_create(&data);
-	if (rc == ECANCELED) {
-		fprintf(stderr, "editor string empty, not adding\n");
-		return EXIT_FAILURE;
-	} else if (rc != 0) {
-		eprint("cannot create data from editor: %s\n", strerror(rc));
-		return EXIT_FAILURE;
+	if (cmd.message == NULL) {
+		rc = editstr_create(&data);
+		if (rc == ECANCELED) {
+			fprintf(stderr, "editor string empty, not adding\n");
+			return EXIT_FAILURE;
+		} else if (rc != 0) {
+			eprint("cannot create data from editor: %s\n",
+					strerror(rc));
+			return EXIT_FAILURE;
+		}
+		message = dstr(&data);
+		len = dstrlen(&data);
+	} else {
+		message = cmd.message;
+		len = strlen(message);
 	}
 
-	id = co_add(co, dstr(&data), dstrlen(&data), cmd.board);
+	id = co_add(co, message, len, cmd.board);
 	if (id == 0) {
 		eprint("cannot add object: %s\n", co_strerror(co));
 		rc = EXIT_FAILURE;
