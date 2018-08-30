@@ -1,3 +1,8 @@
+version := $(shell ./script/get-version.pl include/cobalt/cobalt.h)
+ifneq ($(.SHELLSTATUS),0)
+$(error cannot read cobalt version)
+endif
+
 CC ?= gcc
 CFLAGS += -fpic -Wall -Wextra -std=gnu99 -Iinclude -I. -Ilib -fvisibility=hidden
 DFLAGS += -MMD
@@ -8,7 +13,7 @@ RL ?= ragel
 RLFLAGS += -C
 
 A2X ?= a2x
-DOCFLAGS += -f manpage -d manpage -L
+DOCFLAGS += -f manpage -d manpage -L -a 'manversion=Cobalt $(version)'
 
 GCOV ?= gcov
 
@@ -32,6 +37,7 @@ testbin := $(test:=.test)
 $(foreach R,$(cgen),$(eval CFLAGS_$R := -w))
 
 all: $(cli) $(lib)
+	@echo finished building cobalt $(version)
 
 # turn on valgrind only when specified
 ifdef VALGRIND
