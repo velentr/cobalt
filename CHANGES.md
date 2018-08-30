@@ -8,6 +8,8 @@ All changes between releases will be documented in this file.
  - Added `printf(3)`-style format string argument to `show` command.
  - Argument to the `add` command (`--data|-d`) may be used to specify data on
    the command line, instead of opening `$EDITOR`.
+ - Interface for deleting tasks, both in the API and CLI (using the `-d` switch
+   to the `modify` command).
 
 ### Fixed
  - Added newline to the end of `show` error message.

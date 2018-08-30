@@ -11,6 +11,8 @@
 struct modify_cmd {
 	const char *board;
 	uint32_t id;
+	int del;
+	int nogc;
 };
 
 int modify_parse(int argc, const char *argv[], struct modify_cmd *cmd);

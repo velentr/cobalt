@@ -31,10 +31,21 @@
 			cmd->id |= fc - 'A' + 10;
 	}
 
+	action setdelete {
+		cmd->del = 1;
+	}
+
+	action setnogc {
+		cmd->nogc = 1;
+	}
+
 	board = '@' [^\0/]+;
 	id = [0-9a-fA-F]{8} $adddigit;
+	delete = ( "--delete" | "-d" );
+	nogc = ( "--no-gc" | "-n" );
 
-	main := (( board %setboard | id ) '\0' )+;
+	main := (( board %setboard | id | delete %setdelete | nogc %setnogc )
+			      '\0' )+;
 }%%
 
 int modify_parse(int argc, const char *argv[], struct modify_cmd *cmd)
@@ -45,6 +56,8 @@ int modify_parse(int argc, const char *argv[], struct modify_cmd *cmd)
 
 	cmd->board = NULL;
 	cmd->id = 0;
+	cmd->del = 0;
+	cmd->nogc = 0;
 
 	%% write init;
 
