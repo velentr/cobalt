@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -215,6 +216,52 @@ int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
 
 	rc = co_do_mod_attr(co, sid, name, newval);
 	co->err = rc;
+	return rc;
+}
+
+static int co_do_delete(struct cobalt *co, const char *sid)
+{
+	struct co_db_op delete[] = {
+		OP_SCAT(0, dstr(&co->path), dstrlen(&co->path)),
+		OP_SCPY(1, 0),
+
+		MACRO_SCATL(0, "/obj/"),
+		OP_SCAT(0, sid, CO_SID_LEN - 1),
+		OP_SCPY(3, 0),
+		MACRO_SCATL(0, "attr/board/"),
+		OP_SCAT(0, sid, CO_SID_LEN - 2),
+		MACRO_SCATL(2, "../../../obj/"),
+		OP_SCAT(2, sid, CO_SID_LEN - 2),
+		OP_LDEL(2, 0),
+
+		MACRO_SCATL(1, "/gc/"),
+		OP_DEXIST(1),
+		OP_SCAT(1, sid, CO_SID_LEN - 1),
+		OP_DCREAT(1),
+		OP_FRENAM(3, 1),
+	};
+	return co_db_run(&co->db, delete, lengthof(delete));
+}
+
+int co_delete(struct cobalt *co, uint32_t id, uint32_t flags)
+{
+	char sid[CO_SID_LEN];
+	int rc;
+	uint32_t gcflags;
+
+	snprintf(sid, sizeof(sid), "%08x/", id);
+
+	rc = co_do_delete(co, sid);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+
+	if (!(flags & CO_DEL_NGC)) {
+		gcflags = (flags & CO_DEL_STRICTGC) ? CO_GC_STRICT : 0;
+		rc = co_gc(co, gcflags);
+	}
+
 	return rc;
 }
 

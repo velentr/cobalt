@@ -21,6 +21,9 @@
 /* print a usage message */
 #define uprint(...) fprintf(stderr, "usage: " __VA_ARGS__)
 
+/* macro to make this attribute a little shorter */
+#define UNUSED	__attribute__((unused))
+
 
 #endif /* end of include guard: UTIL_H_ */
 

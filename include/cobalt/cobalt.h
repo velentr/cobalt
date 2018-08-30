@@ -22,6 +22,13 @@
 struct cobalt;
 struct cobalt_query;
 
+/* flags for co_gc() */
+#define CO_GC_STRICT	(1 << 0)
+
+/* flags for co_delete() */
+#define CO_DEL_NGC	(1 << 0)
+#define CO_DEL_STRICTGC	(1 << 1)
+
 /* get version of compiled library */
 void co_version(int *major, int *minor, int *patch) CO_API;
 /* get error string from the last cobalt operation */
@@ -40,6 +47,10 @@ uint32_t co_add(struct cobalt *co, const char *data, size_t len,
 /* modify an existing attribute */
 int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
 		const char *newval) CO_API;
+/* delete an existing cobalt entry */
+int co_delete(struct cobalt *co, uint32_t id, uint32_t flags) CO_API;
+/* run garbage collection on the cobalt task database */
+int co_gc(struct cobalt *co, uint32_t flags) CO_API;
 
 /* get all tasks from the given board */
 int co_get_board(struct cobalt *co, const char *board,
