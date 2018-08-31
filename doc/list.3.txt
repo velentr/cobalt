@@ -89,14 +89,20 @@ API REFERENCE
 	this function, check if the list is empty.
 
 *struct list_elem *list_begin(const struct list *l)*::
-	Get the first element from _l_ for iteration. To iterate over a list,
-	the following should be used:
+	Get the first element from _l_ for iteration.
+
+*list_foreach(struct list_elem *e, struct list *l)*::
+	Macro for iterating over a list. Uses _e_ as an iterator over the list
+	_l_. Inside the loop body, _e_ should be used to access the current
+	element. If the list is modified in the body of the loop, behavior is
+	undefined. To iterate over a list, use the following example:
 
 --------------------------------------------------------------------------------
 struct list_elem *e;
+struct list *l;
 
-for (e = list_begin(l); e != list_end(); e = list_next(e)) {
-	/* do something here */
+list_foreach(e, l) {
+	/* do something with e */
 }
 --------------------------------------------------------------------------------
 

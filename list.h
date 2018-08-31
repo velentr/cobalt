@@ -16,6 +16,10 @@
 	} \
 }
 
+/* macro for iterating over a list */
+#define list_foreach(e, l) \
+	for (e = list_begin(l); e != list_end(l); e = list_next(e))
+
 /* Linked list node */
 struct list_elem {
 	struct list_elem *prev;
