@@ -70,7 +70,7 @@ size_t list_size(const struct list *l)
 
 	assert(l != NULL);
 
-	for (e = list_begin(l); e != list_end(l); e = list_next(e))
+	list_foreach(e, l)
 		num++;
 
 	return num;

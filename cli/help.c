@@ -33,8 +33,7 @@ static void help_all(void)
 	uprint("cobalt <command> [<options> ...]\n");
 
 	fprintf(stderr, "\ncommands:\n");
-	for (le = list_begin(&commands); le != list_end(&commands);
-			le = list_next(le)) {
+	list_foreach(le, &commands) {
 		m = moduleof(le);
 		fprintf(stderr, "\t%s\t%s\n", m->name, m->desc);
 	}

@@ -14,8 +14,7 @@ struct module *module_get(const char *name)
 	struct list_elem *le;
 	struct module *m;
 
-	for (le = list_begin(&commands); le != list_end(&commands);
-			le = list_next(le)) {
+	list_foreach(le, &commands) {
 		m = moduleof(le);
 		if (strcmp(m->name, name) == 0)
 			return m;
