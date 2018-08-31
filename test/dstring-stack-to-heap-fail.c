@@ -3,9 +3,10 @@
 #include <string.h>
 
 #include "dstring.h"
-#include "testlib.h"
 
 #define TEST_STRING "1234567890123456789012345678901234567890"
+
+extern int __malloc_fail;
 
 int main()
 {

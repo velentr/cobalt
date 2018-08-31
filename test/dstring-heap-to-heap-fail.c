@@ -3,10 +3,11 @@
 #include <string.h>
 
 #include "dstring.h"
-#include "testlib.h"
 
 #define TEST_PREFIX "1234567890123456789012345678901234567890"
 #define TEST_SUFFIX "1234567890123456789012345678901234567890"
+
+extern int __realloc_fail;
 
 int main()
 {
