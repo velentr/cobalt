@@ -27,8 +27,9 @@ size_t dstrlen(const struct dstring *s)
 /* find the smallest power-of-two larger than len (len should not include the
  * nil byte
  */
-static size_t dstrsize(size_t len)
+static size_t dstrsize(size_t _len)
 {
+	unsigned len = (unsigned)_len;
 	return 1 << ((8*sizeof(len)) - __builtin_clz(len));
 }
 
