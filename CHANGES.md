@@ -10,6 +10,7 @@ All changes between releases will be documented in this file.
    the command line, instead of opening `$EDITOR`.
  - Interface for deleting tasks, both in the API and CLI (using the `-d` switch
    to the `modify` command).
+ - Interface for manually running garbage collection (`cobalt gc`).
 
 ### Fixed
  - Added newline to the end of `show` error message.
