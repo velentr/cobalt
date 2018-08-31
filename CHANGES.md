@@ -12,6 +12,8 @@ All changes between releases will be documented in this file.
    to the `modify` command).
  - Interface for manually running garbage collection (`cobalt gc`).
  - Documentation for some internal APIs and data structures.
+ - File descriptor tracking, for determining leaked file descriptors with
+   `testlib`.
 
 ### Fixed
  - Added newline to the end of `show` error message.

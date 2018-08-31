@@ -2,12 +2,15 @@
  * Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>
  */
 
+#include <assert.h>
+#include <dirent.h>
 #include <errno.h>
 #include <stdlib.h>
 
 #include <sys/types.h>
 
-#include "testlib.h"
+#include "list.h"
+#include "util.h"
 
 int __malloc_fail = 0;
 extern void *__real_malloc(size_t size);
@@ -106,5 +109,100 @@ int __wrap_unlink(const char *path)
 	} else {
 		return __real_unlink(path);
 	}
+}
+
+/* save all open fds on startup, and make sure no additional fds are open on
+ * shutdown
+ */
+struct open_fd {
+	struct list_elem le;
+	int fd;
+};
+
+static LIST_INIT(__open_at_start);
+
+/* load the list of all open file descriptors into the given list */
+static void __load_open_fds(struct list *l)
+{
+	DIR *fds;
+	struct dirent *fd;
+	struct open_fd *newentry;
+	int skip;
+	int openfd;
+
+	fds = opendir("/proc/self/fd");
+	skip = dirfd(fds);
+
+	for (fd = readdir(fds); fd != NULL; fd = readdir(fds)) {
+		openfd = atoi(fd->d_name);
+		if (openfd == skip)
+			continue;
+
+		newentry = malloc(sizeof(*newentry));
+		assert(newentry != NULL);
+		newentry->fd = openfd;
+		list_pushfront(l, &newentry->le);
+	}
+
+	closedir(fds);
+}
+
+/* check if an fd is present in a list */
+static int __fd_is_present(struct list *fds, int fd)
+{
+	struct list_elem *e;
+	struct open_fd *fd_in_set;
+
+	list_foreach(e, fds) {
+		fd_in_set = containerof(e, struct open_fd, le);
+		if (fd == fd_in_set->fd)
+			return 1;
+	}
+	return 0;
+}
+
+/* free all tracked fds from a set */
+static void __free_fd_set(struct list *fds)
+{
+	struct list_elem *e;
+	struct open_fd *fd;
+
+	while (!list_isempty(fds)) {
+		e = list_popfront(fds);
+		fd = containerof(e, struct open_fd, le);
+		free(fd);
+	}
+}
+
+static void __check_open_fds(void)
+{
+	LIST_INIT(open_at_end);
+	struct list_elem *e;
+	struct open_fd *fd;
+
+	/* get list of open file descriptors at the end of execution */
+	__load_open_fds(&open_at_end);
+
+	list_foreach(e, &open_at_end) {
+		fd = containerof(e, struct open_fd, le);
+		if (!__fd_is_present(&__open_at_start, fd->fd))
+			fprintf(stderr, "leaked file descriptor: %d\n", fd->fd);
+	}
+
+	/* free existing fd sets */
+	__free_fd_set(&open_at_end);
+	__free_fd_set(&__open_at_start);
+}
+
+static void __attribute__ ((constructor)) __start_open_fds(void)
+{
+	int rc;
+
+	/* store list of all open file descriptors at start */
+	__load_open_fds(&__open_at_start);
+
+	/* at exit, check that no additional descriptors are open */
+	rc = atexit(__check_open_fds);
+	assert(rc == 0);
 }
 
