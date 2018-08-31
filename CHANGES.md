@@ -11,6 +11,7 @@ All changes between releases will be documented in this file.
  - Interface for deleting tasks, both in the API and CLI (using the `-d` switch
    to the `modify` command).
  - Interface for manually running garbage collection (`cobalt gc`).
+ - Documentation for some internal APIs and data structures.
 
 ### Fixed
  - Added newline to the end of `show` error message.

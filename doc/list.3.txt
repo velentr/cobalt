@@ -1,0 +1,125 @@
+LIST(3)
+=======
+:doctype: manpage
+
+NAME
+----
+list - intrusive doubly-linked list
+
+DESCRIPTION
+-----------
+This data structure is used for intrusive (ie embedded in another structure)
+doubly-linked lists. The API is designed such that no dynamic memory is
+required, and all list elements may be embedded in existing structures.
+
+To use this API, add a _struct list_elem_ to the data structure that needs to be
+added to the list; all functions in this API will then operate on a pointer to
+that member. A pointer to the containing structure may be retrieved using the
+_containerof()_ macro.
+
+TYPES
+-----
+*struct list_elem*::
+	A node in a doubly-linked list structure. The members of this structure
+	should not be manipulated directly. This structure does not need to be
+	initialized.
+
+*struct list*::
+	Doubly-linked list structure. The list itself contains a sentinel list
+	element used to reference the other elements in the list. This structure
+	must either be declared using the _LIST_INIT()_ macro, or it must be
+	initialized dynamically with _list_init()_ before it can be used.
+
+API REFERENCE
+-------------
+*LIST_INIT(listname)*::
+	Statically declare and initialize a list named _listname_. This may be
+	used in function or global scope, and may be modified with other
+	variable modifiers (eg _static_).
+
+*void list_init(struct list *l)*::
+	Initialize the linked list _l_. This function must be called before the
+	list can be used.
+
+*void list_insert(struct list_elem *prev, struct list_elem *add)*::
+	Add the list element _add_ directly after the list element _prev_ in a
+	linked list. If _add_ is already in a list, or _prev_ is not already in
+	a list, then behavior is undefined.
+
+*void list_remove(struct list_elem *e)*::
+	Remove _e_ from its list. If _e_ is not already in a list, then behavior
+	is undefined.
+
+*struct list_elem *list_popfront(struct list *l)*::
+	Remove the first element from _l_ and return it. If _l_ is empty, then
+	behavior is undefined.
+
+*struct list_elem *list_popback(struct list *l)*::
+	Remove the last element from _l_ and return it. If _l_ is empty, then
+	behavior is undefined.
+
+*void list_pushfront(struct list *l, struct list_elem *e)*::
+	Add the element _e_ to the front of the list _l_. If _e_ is already in a
+	list, then behavior is undefined.
+
+*void list_pushback(struct list *l, struct list_elem *e)*::
+	Add the element _e_ to the end of the list _l_. If _e_ is already in a
+	list, then behavior is undefined.
+
+*size_t list_size(const struct list *l)*::
+	Count the number of elements in _l_ by iterating over the entire list.
+	This function runs in _O(n)_ time with respect to the number of elements
+	in the list.
+
+*void list_cat(struct list *dst, struct list *src)*::
+	Concatenate _src_ onto the end of _dst_. As a result, _dst_ will contain
+	all of its elements from before the operation (in the same order)
+	followed by all the elements of _src_ (in the same order). After this
+	operation, _dst_ should be used for any operations on these elements;
+	any operations on _src_ after this will result in undefined behavior.
+
+*struct list_elem *list_head(const struct list *l)*::
+	Get the first element from _l_. If _l_ is empty, returns the sentinel
+	element, which may not be valid. Before using the element returned by
+	this function, check if the list is empty.
+
+*struct list_elem *list_tail(const struct list *l)*::
+	Get the last element from _l_. If _l_ is empty, returns the sentinel
+	element, which may not be valid. Before using the element returned by
+	this function, check if the list is empty.
+
+*struct list_elem *list_begin(const struct list *l)*::
+	Get the first element from _l_ for iteration. To iterate over a list,
+	the following should be used:
+
+--------------------------------------------------------------------------------
+struct list_elem *e;
+
+for (e = list_begin(l); e != list_end(); e = list_next(e)) {
+	/* do something here */
+}
+--------------------------------------------------------------------------------
+
+*struct list_elem *list_next(struct list_elem *e)*::
+	Get the element immediately following _e_ for iteration. Note that this
+	element may be the sentinel element and should be checked before using.
+
+*struct list_elem *list_prev(struct list_elem *e)*::
+	Get the element immediately preceding _e_ for iteration. Note that this
+	element may be the sentinel element and should be checked before using.
+
+*struct list_elem *list_end(struct list *l)*::
+	Get the sentinel element from _l_ to test for end of iteration. The
+	resulting element is not valid and should not be used, except to test
+	for equality.
+
+*int list_isempty(struct list *l)*::
+	Check if _l_ is empty. Returns true if _l_ contains no elements; returns
+	false if _l_ contains at least one element.
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
