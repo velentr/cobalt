@@ -1,5 +1,6 @@
 dir := test
 
+test += $(dir)/dstring-cat-after-clear
 test += $(dir)/dstring-cat-heap-heap
 test += $(dir)/dstring-cat-heap-heap-long
 test += $(dir)/dstring-cat-stack-heap

@@ -206,9 +206,7 @@ void dstrclr(struct dstring *dst)
 	if (dstrdynamic(dst))
 		free(dst->heap.p);
 
-	dst->used = 0;
-	dst->stack[0] = '\0';
-	dst->type = DSTR_STACK;
+	dstrempty(dst);
 }
 
 void dstrdel(struct dstring *str, size_t len)
