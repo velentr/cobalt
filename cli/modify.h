@@ -13,6 +13,7 @@ struct modify_cmd {
 	uint32_t id;
 	int del;
 	int nogc;
+	int edit;
 };
 
 int modify_parse(int argc, const char *argv[], struct modify_cmd *cmd);

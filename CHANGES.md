@@ -10,6 +10,8 @@ All changes between releases will be documented in this file.
    the command line, instead of opening `$EDITOR`.
  - Interface for deleting tasks, both in the API and CLI (using the `-d` switch
    to the `modify` command).
+ - Interface for modifying the data of a task, both in the API and CLI (using
+   the `-e` switch to the `modify` command).
  - Interface for manually running garbage collection (`cobalt gc`).
  - Documentation for some internal APIs and data structures.
  - File descriptor tracking, for determining leaked file descriptors with
@@ -17,6 +19,7 @@ All changes between releases will be documented in this file.
 
 ### Fixed
  - Added newline to the end of `show` error message.
+ - Fix use of dstring after it is cleared.
 
 ## 0.0.1 (2018/08/27)
 ### Added

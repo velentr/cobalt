@@ -39,13 +39,18 @@
 		cmd->nogc = 1;
 	}
 
+	action setedit {
+		cmd->edit = 1;
+	}
+
 	board = '@' [^\0/]+;
 	id = [0-9a-fA-F]{8} $adddigit;
 	delete = ( "--delete" | "-d" );
 	nogc = ( "--no-gc" | "-n" );
+	edit = ( "--edit" | "-e" );
 
-	main := (( board %setboard | id | delete %setdelete | nogc %setnogc )
-			      '\0' )+;
+	main := (( board %setboard | id | delete %setdelete | nogc %setnogc
+			| edit %setedit ) '\0' )+;
 }%%
 
 int modify_parse(int argc, const char *argv[], struct modify_cmd *cmd)
@@ -58,6 +63,7 @@ int modify_parse(int argc, const char *argv[], struct modify_cmd *cmd)
 	cmd->id = 0;
 	cmd->del = 0;
 	cmd->nogc = 0;
+	cmd->edit = 0;
 
 	%% write init;
 
