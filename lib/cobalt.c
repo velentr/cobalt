@@ -163,6 +163,35 @@ uint32_t co_add(struct cobalt *co, const char *data, size_t len,
 	}
 }
 
+static int co_do_mod_data(struct cobalt *co, const char *sid, const char *data,
+		size_t len)
+{
+	const struct co_db_op mod_data[] = {
+		OP_SCAT(0, dstr(&co->path), dstrlen(&co->path)),
+		MACRO_SCATL(0, "/obj/"),
+		OP_SCAT(0, sid, CO_SID_LEN - 1),
+		OP_SCPY(1, 0),
+		MACRO_SCATL(0, "tmp"),
+		MACRO_SCATL(1, "data"),
+
+		OP_FCREAT(0, data, len),
+		OP_FRENAM(0, 1),
+	};
+	return co_db_run(&co->db, mod_data, lengthof(mod_data));
+}
+
+int co_mod_data(struct cobalt *co, uint32_t id, const char *data, size_t len)
+{
+	char sid[CO_SID_LEN];
+	int rc;
+
+	snprintf(sid, sizeof(sid), "%08x/", id);
+
+	rc = co_do_mod_data(co, sid, data, len);
+	co->err = rc;
+	return rc;
+}
+
 static int co_do_mod_attr(struct cobalt *co, const char *sid, const char *name,
 		const char *newval)
 {
