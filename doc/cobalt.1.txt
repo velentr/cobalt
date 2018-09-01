@@ -30,6 +30,10 @@ COMMANDS
 	the command line, and the user's editor will be opened to write the data
 	for the task. A random ID will be chosen for the new task.
 
+*gc*::
+	Run garbage collection on the database. This generally does not need to
+	be used.
+
 *help*::
 	Print usage general usage information about 'cobalt', or usage
 	information about a specific command.
