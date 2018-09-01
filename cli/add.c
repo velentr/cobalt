@@ -60,7 +60,7 @@ static int add_main(int argc, const char *argv[])
 	}
 
 	if (cmd.message == NULL) {
-		rc = editstr_create(&data);
+		rc = editstr_create(&data, NULL, 0);
 		if (rc == ECANCELED) {
 			fprintf(stderr, "editor string empty, not adding\n");
 			return EXIT_FAILURE;

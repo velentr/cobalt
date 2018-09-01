@@ -22,7 +22,7 @@ struct editstr {
 };
 
 /* create a new editor string */
-int editstr_create(struct dstring *s);
+int editstr_create(struct dstring *s, const char *template, size_t len);
 
 /* print the editstring */
 int editstr_write(struct dstring *s, const struct editstr *es);

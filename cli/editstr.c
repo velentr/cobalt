@@ -58,7 +58,7 @@ static void editstr_destroy(struct editstr *es)
 		close(es->fd);
 }
 
-int editstr_create(struct dstring *s)
+int editstr_create(struct dstring *s, const char *template, size_t len)
 {
 	char cmd[] = "$EDITOR " EDITSTR_TMPFILE;
 	struct editstr es;
@@ -80,6 +80,17 @@ int editstr_create(struct dstring *s)
 		goto error_destroy;
 	}
 	strcpy(es.fname, fname);
+
+	/* write template to the file before opening in editor */
+	if (template != NULL && len > 0) {
+		rc = write(fd, template, len);
+		if (rc < 0) {
+			rc = errno;
+			close(fd);
+			goto error_destroy;
+		}
+	}
+
 	/* On some systems, the editor opens using CoW, so we need to re-open in
 	 * this function in order to mmap() the updated file
 	 */
