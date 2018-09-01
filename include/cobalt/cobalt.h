@@ -62,6 +62,9 @@ int co_delete(struct cobalt *co, uint32_t id, uint32_t flags) CO_API;
 /* run garbage collection on the cobalt task database */
 int co_gc(struct cobalt *co, uint32_t flags) CO_API;
 
+/* get the task with the given id */
+int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q) CO_API;
+
 /* get all tasks from the given board */
 int co_get_board(struct cobalt *co, const char *board,
 		struct cobalt_query **q) CO_API;

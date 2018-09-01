@@ -6,6 +6,9 @@
 #define OPCODES_H_
 
 
+#include <stdint.h>
+#include <stdlib.h>
+
 typedef enum {
 	CO_DB_DIR_EXIST,
 	CO_DB_DIR_CREATE,
@@ -15,8 +18,9 @@ typedef enum {
 	CO_DB_SYM_DELETE,
 	CO_DB_STR_CAT,
 	CO_DB_STR_COPY,
-	CO_DB_QUERY_LOAD,
-	CO_DB_QUERY_READ,
+	CO_DB_QUERY_INDEX_LOAD,
+	CO_DB_QUERY_INDEX_READ,
+	CO_DB_QUERY_ID_READ,
 	CO_DB_QUERY_MAP,
 	CO_DB_QUERY_BOARD,
 	CO_DB_NOP,
@@ -30,6 +34,7 @@ struct co_db_op {
 	size_t str0;
 	size_t str1;
 	co_opcode_t type;
+	uint32_t id0;
 };
 
 #define OP_DEXIST(path) \
@@ -48,10 +53,12 @@ struct co_db_op {
 	{ .type = CO_DB_STR_CAT, .str0 = dst, .data = src, .len = size, }
 #define OP_SCPY(dst, src) \
 	{ .type = CO_DB_STR_COPY, .str0 = dst, .str1 = src, }
-#define OP_QLD(dir) \
-	{ .type = CO_DB_QUERY_LOAD, .str0 = dir, }
-#define OP_QRD \
-	{ .type = CO_DB_QUERY_READ, }
+#define OP_QILD(dir) \
+	{ .type = CO_DB_QUERY_INDEX_LOAD, .str0 = dir, }
+#define OP_QIRD \
+	{ .type = CO_DB_QUERY_INDEX_READ, }
+#define OP_QDRD(id) \
+	{ .type = CO_DB_QUERY_ID_READ, .id0 = id }
 #define OP_QMAP \
 	{ .type = CO_DB_QUERY_MAP, }
 #define OP_QBD \

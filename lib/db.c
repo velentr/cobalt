@@ -210,7 +210,8 @@ static void co_db_str_copy_revert(struct co_db *db, const struct co_db_op *op)
 	dstrdel(dst, dstrlen(src));
 }
 
-static int co_db_query_load_run(struct co_db *db, const struct co_db_op *op)
+static int co_db_query_index_load_run(struct co_db *db,
+		const struct co_db_op *op)
 {
 	const char *dirname;
 
@@ -226,7 +227,7 @@ static int co_db_query_load_run(struct co_db *db, const struct co_db_op *op)
 	return CO_ENOERR;
 }
 
-static void co_db_query_load_revert(struct co_db *db)
+static void co_db_query_index_load_revert(struct co_db *db)
 {
 	struct list_elem *le;
 	struct cobalt_query *q;
@@ -238,7 +239,7 @@ static void co_db_query_load_revert(struct co_db *db)
 	}
 }
 
-static int co_db_query_read_run(struct co_db *db)
+static int co_db_query_index_read_run(struct co_db *db)
 {
 	struct cobalt_query *q;
 	struct dirent *obj;
@@ -276,6 +277,25 @@ static int co_db_query_read_run(struct co_db *db)
 
 	/* we haven't read all dir entries yet */
 	db->ip--;
+	return CO_ENOERR;
+}
+
+static int co_db_query_id_read_run(struct co_db *db, uint32_t id)
+{
+	struct cobalt_query *q;
+
+	q = malloc(sizeof(*q));
+	if (q == NULL)
+		return errno;
+
+	q->id = id;
+	q->data = NULL;
+	q->len = 0;
+	dstrempty(&q->board);
+	list_pushfront(&db->query, &q->le);
+
+	db->cursor = list_head(&db->query);
+
 	return CO_ENOERR;
 }
 
@@ -352,11 +372,14 @@ static int co_db_run_opcode(struct co_db *db, const struct co_db_op * const op)
 	case CO_DB_STR_COPY:
 		rc = co_db_str_copy_run(db, op);
 		break;
-	case CO_DB_QUERY_LOAD:
-		rc = co_db_query_load_run(db, op);
+	case CO_DB_QUERY_INDEX_LOAD:
+		rc = co_db_query_index_load_run(db, op);
 		break;
-	case CO_DB_QUERY_READ:
-		rc = co_db_query_read_run(db);
+	case CO_DB_QUERY_INDEX_READ:
+		rc = co_db_query_index_read_run(db);
+		break;
+	case CO_DB_QUERY_ID_READ:
+		rc = co_db_query_id_read_run(db, op->id0);
 		break;
 	case CO_DB_QUERY_MAP:
 		rc = co_db_query_map_run(db);
@@ -399,8 +422,8 @@ static void co_db_revert_opcode(struct co_db *db,
 	case CO_DB_STR_COPY:
 		co_db_str_copy_revert(db, op);
 		break;
-	case CO_DB_QUERY_LOAD:
-		co_db_query_load_revert(db);
+	case CO_DB_QUERY_INDEX_LOAD:
+		co_db_query_index_load_revert(db);
 		break;
 	case CO_DB_ABORT:
 		assert(0);

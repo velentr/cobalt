@@ -294,6 +294,29 @@ int co_delete(struct cobalt *co, uint32_t id, uint32_t flags)
 	return rc;
 }
 
+int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q)
+{
+	int rc;
+	struct list_elem *result;
+	struct co_db_op get_id[] = {
+		OP_SCAT(0, dstr(&co->path), dstrlen(&co->path)),
+		MACRO_SCATL(0, "/obj/"),
+		OP_QILD(0),
+		OP_QDRD(id),
+		OP_QMAP,
+	};
+	rc = co_db_run(&co->db, get_id, lengthof(get_id));
+	if (rc == CO_ENOERR) {
+		assert(!list_isempty(&co->db.query));
+		result = list_popfront(&co->db.query);
+		*q = containerof(result, struct cobalt_query, le);
+		return CO_ENOERR;
+	} else {
+		co->err = rc;
+		return rc;
+	}
+}
+
 int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q)
 {
 	int rc;
@@ -302,8 +325,8 @@ int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q)
 		OP_SCAT(0, dstr(&co->path), dstrlen(&co->path)),
 		MACRO_SCATL(0, "/attr/board/"),
 		MACRO_SCATL(0, board),
-		OP_QLD(0),
-		OP_QRD,
+		OP_QILD(0),
+		OP_QIRD,
 		OP_QMAP,
 	};
 
