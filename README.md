@@ -5,6 +5,9 @@ lists. All tasks are identified by a unique 32-bit identifier (represented as an
 8 character hex string) and are grouped according to "boards". Each task is
 composed of a short description.
 
+Note that the API for the shared library is not yet stable, and should not be
+used.
+
 ## Dependencies
 There are no runtime dependencies (besides a C library).
 
@@ -33,8 +36,17 @@ To run the unit tests:
 $ make test
 ```
 
-After building, the `libcobalt.so` must be added to your shared library path,
-and `cobalt` should be added to your path.
+To build the documentation:
+```
+$ make doc
+```
+
+To install to /tmp/usr:
+```
+$ make DESTDIR=/tmp prefix=/usr install
+```
+Note that `DESTDIR` defaults to the empty string, and `prefix` defaults to
+`/usr/local`.
 
 ## Usage
 

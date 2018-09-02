@@ -17,6 +17,15 @@ DOCFLAGS += -f manpage -d manpage -L -a 'manversion=Cobalt $(version)'
 
 GCOV ?= gcov
 
+INSTALL ?= install
+INSTALL_PROGRAM := $(INSTALL)
+INSTALL_DATA := $(INSTALL) -m 644
+INSTALL_DIR := $(INSTALL) -d
+prefix ?= $(DESTDIR)/usr/local
+libdir ?= $(prefix)/lib
+bindir ?= $(prefix)/bin
+includedir ?= $(prefix)/include/cobalt
+
 # shared variables need immediate assignment since $(dir) will change between
 # directories
 cgen :=
@@ -39,6 +48,15 @@ $(foreach R,$(cgen),$(eval CFLAGS_$R := -w))
 
 all: $(cli) $(lib)
 	@echo finished building cobalt $(version)
+
+install: $(cli) $(lib)
+	$(INSTALL_DIR) $(bindir) $(libdir) $(includedir)
+	$(INSTALL_PROGRAM) $(cli) $(bindir)/$(cli)
+	$(INSTALL_PROGRAM) $(lib) $(libdir)/$(lib)
+	$(INSTALL_DATA) include/cobalt/* $(includedir)/
+
+uninstall:
+	rm -f $(bindir)/$(cli) $(libdir)/$(lib) $(includedir)/*
 
 # turn on valgrind only when specified
 ifdef VALGRIND
@@ -110,7 +128,7 @@ $(doc): $$@.txt $(docconf)
 	@echo "DOC	$@"
 	$(A2X) $(DOCFLAGS) $<
 
-.PHONY: all clean clean-test cover doc retest test
+.PHONY: all clean clean-test cover doc install retest test uninstall
 
 # disable automatic rules
 .SUFFIXES:

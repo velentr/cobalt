@@ -2,6 +2,9 @@
 All changes between releases will be documented in this file.
 
 ## Unreleased
+### Added
+ - Install and uninstall targets to Makefile.
+
 ### Changed
  - Converted `testbench.pl` to `run-test.pl`, which runs a single test. This
    allows the Makefile to divide tests into different rules and parallelize the
