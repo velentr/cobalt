@@ -7,7 +7,6 @@
 
 #include <cobalt/cobalt.h>
 
-#include "dstring.h"
 #include "struct.h"
 #include "util.h"
 
@@ -22,35 +21,27 @@ static void run_test(struct co_db *db, const char *file)
 	assert(co_db_run(db, test, lengthof(test)) == CO_ENOERR);
 }
 
-int main(int argc, const char * const argv[])
+int main()
 {
-	struct dstring file = DSTR_EMPTY;
 	struct co_db db;
 	struct stat st;
 	int fd;
 	char buf[BUFSIZ];
 
-	if (argc == 1)
-		assert(dstrcat(&file, ".") == CO_ENOERR);
-	else
-		assert(dstrcat(&file, argv[1]) == CO_ENOERR);
-	assert(dstrcat(&file, "/file") == CO_ENOERR);
 	co_db_init(&db);
-	run_test(&db, dstr(&file));
+	run_test(&db, "./file");
 	co_db_free(&db);
 
-	assert(stat(dstr(&file), &st) == 0);
+	assert(stat("./file", &st) == 0);
 	assert(S_ISREG(st.st_mode));
 
-	fd = open(dstr(&file), O_RDONLY);
+	fd = open("./file", O_RDONLY);
 	assert(fd != -1);
 	assert(read(fd, buf, sizeof(buf)) == strlen(TEST_CONTENTS));
 	close(fd);
 	buf[strlen(TEST_CONTENTS)] = '\0';
 
 	assert(strcmp(buf, TEST_CONTENTS) == 0);
-
-	dstrclr(&file);
 
 	return 0;
 }

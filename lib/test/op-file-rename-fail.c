@@ -8,7 +8,6 @@
 
 #include <cobalt/cobalt.h>
 
-#include "dstring.h"
 #include "struct.h"
 #include "util.h"
 
@@ -28,38 +27,25 @@ static void run_test(struct co_db *db, const char *file)
 	__rename_fail = 0;
 }
 
-int main(int argc, const char * const argv[])
+int main()
 {
-	struct dstring file = DSTR_EMPTY;
 	struct co_db db;
 	struct stat st;
 	int fd;
 
-	if (argc == 1)
-		assert(dstrcat(&file, ".") == CO_ENOERR);
-	else
-		assert(dstrcat(&file, argv[1]) == CO_ENOERR);
-
-	assert(dstrcat(&file, "/old") == CO_ENOERR);
-	fd = open(dstr(&file), O_RDONLY | O_CREAT, 0644);
+	fd = open("./old", O_RDONLY | O_CREAT, 0644);
 	assert(fd != -1);
 	close(fd);
-	dstrdel(&file, 4);
 
 	co_db_init(&db);
-	run_test(&db, dstr(&file));
+	run_test(&db, ".");
 	co_db_free(&db);
 
-	assert(dstrcat(&file, "/new") == 0);
-	assert(stat(dstr(&file), &st) == -1);
+	assert(stat("./new", &st) == -1);
 	assert(errno == ENOENT);
-	dstrdel(&file, 4);
 
-	assert(dstrcat(&file, "/old") == 0);
-	assert(stat(dstr(&file), &st) == 0);
+	assert(stat("./old", &st) == 0);
 	assert(S_ISREG(st.st_mode));
-
-	dstrclr(&file);
 
 	return 0;
 }

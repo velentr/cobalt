@@ -14,17 +14,12 @@ static void run_test(struct co_db *db, const char *dir)
 	assert(co_db_run(db, test, lengthof(test)) == CO_ENOERR);
 }
 
-int main(int argc, const char * const argv[])
+int main()
 {
 	struct co_db db;
-	const char *dir;
 
-	if (argc == 1)
-		dir = ".";
-	else
-		dir = argv[1];
 	co_db_init(&db);
-	run_test(&db, dir);
+	run_test(&db, ".");
 	co_db_free(&db);
 
 	return 0;
