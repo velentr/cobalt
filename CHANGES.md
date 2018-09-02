@@ -1,6 +1,12 @@
 # Changelog
 All changes between releases will be documented in this file.
 
+## Unreleased
+### Changed
+ - Converted `testbench.pl` to `run-test.pl`, which runs a single test. This
+   allows the Makefile to divide tests into different rules and parallelize the
+   results.
+
 ## 0.1.0 (2018/09/01)
 ### Added
  - Man page for `cobalt` command using `asciidoc(1)`, along with `Makefile`

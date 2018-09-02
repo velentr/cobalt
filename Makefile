@@ -32,6 +32,7 @@ include src.mk
 testobj := $(test:=.o) $(testlib:=.o)
 testdep := $(test:=.d)
 testbin := $(test:=.test)
+testres := $(test:=.result)
 
 # turn off warnings for generated C files
 $(foreach R,$(cgen),$(eval CFLAGS_$R := -w))
@@ -44,8 +45,10 @@ ifdef VALGRIND
 vlgnd := --valgrind
 endif
 
-test: $(testbin)
-	./script/testbench.pl $(vlgnd) $(testbin)
+test: $(testres)
+	@echo all tests passed
+
+retest: clean-test test
 
 # add gcov CFLAGS to each tested module when the cover target is run
 define COV
@@ -87,7 +90,14 @@ $(lib): $(libobj) $(obj)
 	@echo "LD	$*"
 	$(CC) $^ -o $@ $(LDFLAGS_test) $(LDFLAGS)
 
-clean:
+%.result: %.test ./script/run-test.pl
+	@echo "TEST	$*"
+	./script/run-test.pl $< -o $@ $(vlgnd)
+
+clean-test:
+	rm -f $(testres)
+
+clean: clean-test
 	@echo cleaning...
 	rm -f $(cliobj) $(clidep) $(clisrc) $(cli) $(lib) $(libobj) $(libdep) \
 		$(obj) $(dep) $(testobj) $(testdep) $(testbin) $(doc)
@@ -100,12 +110,12 @@ $(doc): $$@.txt $(docconf)
 	@echo "DOC	$@"
 	$(A2X) $(DOCFLAGS) $<
 
-.PHONY: all clean cover doc test
+.PHONY: all clean clean-test cover doc retest test
 
 # disable automatic rules
 .SUFFIXES:
 
-.PRECIOUS: %.o %.c
+.PRECIOUS: %.o %.c %.test
 
 # print jobs if V is defined to any value
 $(V).SILENT:

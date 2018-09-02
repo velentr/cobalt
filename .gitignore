@@ -2,6 +2,7 @@
 *.d
 *.s
 *.test
+*.result
 .*
 *_parse.c
 /cobalt
