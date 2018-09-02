@@ -34,13 +34,24 @@
 		cmd->format = arg;
 	}
 
+	action adddigit {
+		cmd->id <<= 4;
+		if ('0' <= fc && fc <= '9')
+			cmd->id |= fc - '0';
+		else if ('a' <= fc && fc <= 'f')
+			cmd->id |= fc - 'a' + 10;
+		else
+			cmd->id |= fc - 'A' + 10;
+	}
+
 	board = '@' [^\0/]+;
 	noboard = ("--no-board" | "-n");
 	long = ("--long" | "-l");
 	format = ( "--format\0" | "-f\0" ) [^\0]+;
+	id = [0-9a-fA-F]{8} $adddigit;
 
 	main := (( board %setboard | noboard %setnoboard | long %setlong |
-			format %setformat ) '\0' )+;
+			format %setformat | id ) '\0' )+;
 }%%
 
 int show_parse(int argc, const char *argv[], struct show_cmd *cmd)
@@ -52,6 +63,7 @@ int show_parse(int argc, const char *argv[], struct show_cmd *cmd)
 	cmd->board = NULL;
 	cmd->format = "  %i  %s\n";
 	cmd->noboard = 0;
+	cmd->id = 0;
 
 	%% write init;
 

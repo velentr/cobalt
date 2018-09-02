@@ -6,6 +6,7 @@ All changes between releases will be documented in this file.
  - Man page for `cobalt` command using `asciidoc(1)`, along with `Makefile`
    changes to build documentation.
  - Added `printf(3)`-style format string argument to `show` command.
+ - Argument to the `show` command to show a single id instead of a whole board.
  - Argument to the `add` command (`--data|-d`) may be used to specify data on
    the command line, instead of opening `$EDITOR`.
  - Interface for deleting tasks, both in the API and CLI (using the `-d` switch

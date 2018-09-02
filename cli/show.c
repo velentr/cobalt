@@ -17,7 +17,7 @@
 static void show_usage(void)
 {
 	uprint("cobalt show [--format|-f <format>] [--long|-l] [--no-board|-n]"
-			" @<board>\n");
+			" [@<board>] [<id>]\n");
 }
 
 static void show_usage_long(void)
@@ -32,6 +32,7 @@ static void show_usage_long(void)
 	fprintf(stderr, "\n");
 	fprintf(stderr, "arguments:\n");
 	fprintf(stderr, "\t<board>\t\tboard to show all tasks from\n");
+	fprintf(stderr, "\t<id>\t\tnumeric id of the board to show\n");
 }
 static void show_printf(const char *fmt, struct cobalt_query *task)
 {
@@ -117,7 +118,7 @@ static int show_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (cmd.board == NULL) {
+	if (cmd.board == NULL && cmd.id == 0) {
 		eprint("must supply board to show from\n");
 		return EXIT_FAILURE;
 	}
@@ -128,11 +129,15 @@ static int show_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	rc = co_get_board(co, cmd.board, &q);
+	if (cmd.board != NULL)
+		rc = co_get_board(co, cmd.board, &q);
+	else
+		rc = co_get_task(co, cmd.id, &q);
+
 	if (rc == CO_ENOERR) {
 		rc = EXIT_SUCCESS;
 
-		if (!cmd.noboard)
+		if (cmd.id == 0 && !cmd.noboard)
 			printf("@%s\n", cmd.board);
 
 		for (; q != NULL; q = co_query_getnext(co, q))
