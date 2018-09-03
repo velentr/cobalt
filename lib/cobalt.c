@@ -304,6 +304,7 @@ int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q)
 		OP_QILD(0),
 		OP_QDRD(id),
 		OP_QMAP,
+		OP_QBD,
 	};
 	rc = co_db_run(&co->db, get_id, lengthof(get_id));
 	if (rc == CO_ENOERR) {
@@ -328,6 +329,7 @@ int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q)
 		OP_QILD(0),
 		OP_QIRD,
 		OP_QMAP,
+		OP_QBD,
 	};
 
 	rc = co_db_run(&co->db, get_board, lengthof(get_board));
@@ -369,9 +371,7 @@ uint32_t co_query_getid(struct cobalt_query *q)
 
 const char *co_query_getboard(struct cobalt_query *q)
 {
-	/* return dstr(&q->board); */
-	(void)q;
-	return NULL;
+	return dstr(&q->board);
 }
 
 void co_query_getdata(struct cobalt_query *q, const char **data, size_t *len)

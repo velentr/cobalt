@@ -26,6 +26,9 @@ static const char *co_strerror_priv(int errnum)
 	case CO_EABORT:
 		ret = "Operation aborted";
 		break;
+	case CO_ECORRUPT:
+		ret = "Database corruption detected";
+		break;
 	default:
 		ret = "Unknown error";
 		break;

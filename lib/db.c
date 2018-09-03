@@ -2,12 +2,15 @@
  * Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>
  */
 
+#define _GNU_SOURCE
+
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <sys/mman.h>
@@ -335,8 +338,44 @@ static int co_db_query_map_run(struct co_db *db)
 		}
 	}
 
-	db->cursor = list_next(db->cursor);
 	/* we haven't mapped all dir entries yet */
+	db->cursor = list_next(db->cursor);
+	db->ip--;
+	return CO_ENOERR;
+}
+
+static int co_db_query_board_run(struct co_db *db)
+{
+	struct cobalt_query *q;
+	char *startp;
+	ssize_t len;
+	int rc;
+	char filname[sizeof("XXXXXXXX/attr/board")];
+	char buf[PATH_MAX];
+
+	/* check if we've finished reading all queries */
+	if (db->cursor == list_end(&db->query)) {
+		db->cursor = list_head(&db->query);
+		return CO_ENOERR;
+	}
+
+	/* get the basename of the path in the symlink */
+	q = containerof(db->cursor, struct cobalt_query, le);
+	snprintf(filname, sizeof(filname), "%08x/attr/board", q->id);
+	len = readlinkat(dirfd(db->qdir), filname, buf, PATH_MAX);
+	if (len == -1)
+		return errno;
+	startp = memrchr(buf, '/', len);
+	if (startp == NULL || startp == buf + len - 1)
+		return CO_ECORRUPT;
+	startp++;
+
+	rc = dstrcpyl(&q->board, startp, len - (startp - buf));
+	if (rc != 0)
+		return rc;
+
+	/* we haven't read all dir entries yet */
+	db->cursor = list_next(db->cursor);
 	db->ip--;
 	return CO_ENOERR;
 }
@@ -383,6 +422,9 @@ static int co_db_run_opcode(struct co_db *db, const struct co_db_op * const op)
 		break;
 	case CO_DB_QUERY_MAP:
 		rc = co_db_query_map_run(db);
+		break;
+	case CO_DB_QUERY_BOARD:
+		rc = co_db_query_board_run(db);
 		break;
 	case CO_DB_ABORT:
 		rc = CO_EABORT;

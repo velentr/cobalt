@@ -10,6 +10,7 @@
 #define CO_EIDINUSE	-1
 #define CO_EINCOMPLETE	-2
 #define CO_EABORT	-3
+#define CO_ECORRUPT	-4
 
 
 #endif /* end of include guard: COBALT_ERROR_H_ */
