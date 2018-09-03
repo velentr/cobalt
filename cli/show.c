@@ -39,6 +39,7 @@ static void show_printf(const char *fmt, struct cobalt_query *task)
 	enum { NORMAL, FORMAT, ESCAPE } state;
 	const char *data;
 	const char *end;
+	const char *board = NULL;
 	size_t len;
 
 	co_query_getdata(task, &data, &len);
@@ -59,6 +60,11 @@ static void show_printf(const char *fmt, struct cobalt_query *task)
 			break;
 		case FORMAT:
 			switch (*fmt) {
+			case 'b':
+				if (board == NULL)
+					board = co_query_getboard(task);
+				printf("@%s", board);
+				break;
 			case 'i':
 				printf("%08x", co_query_getid(task));
 				break;
