@@ -4,6 +4,9 @@ All changes between releases will be documented in this file.
 ## Unreleased
 ### Added
  - Install and uninstall targets to Makefile.
+ - Implemented loading the board during a query, so the `co_query_getboard()`
+   functions will work.
+ - Format `%b` is used by `cobalt show` to print the board for the task.
 
 ### Changed
  - Converted `testbench.pl` to `run-test.pl`, which runs a single test. This
