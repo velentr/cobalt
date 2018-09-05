@@ -131,19 +131,35 @@ static int show_main(int argc, const char *argv[])
 	}
 
 	if (cmd.board == NULL && cmd.id == 0) {
-		cmd.format = "%b\t %i  %s\n";
-		cmd.noboard = 1;
+		if (cmd.format == NULL) {
+			if (cmd.lng)
+				cmd.format = "%b\t %i\n%l";
+			else
+				cmd.format = "%b\t %i  %s\n";
+		}
 		rc = co_get_all(co, &q);
 	} else if (cmd.board != NULL) {
+		if (cmd.format == NULL) {
+			if (cmd.lng)
+				cmd.format = "%i\n%l\n";
+			else
+				cmd.format = "  %i  %s\n";
+		}
 		rc = co_get_board(co, cmd.board, &q);
 	} else {
+		if (cmd.format == NULL) {
+			if (cmd.lng)
+				cmd.format = "%i\n%l\n";
+			else
+				cmd.format = "  %i  %s\n";
+		}
 		rc = co_get_task(co, cmd.id, &q);
 	}
 
 	if (rc == CO_ENOERR) {
 		rc = EXIT_SUCCESS;
 
-		if (cmd.id == 0 && !cmd.noboard)
+		if (cmd.board != NULL && !cmd.noboard)
 			printf("@%s\n", cmd.board);
 
 		for (; q != NULL; q = co_query_getnext(co, q))

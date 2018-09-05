@@ -11,6 +11,7 @@
 struct show_cmd {
 	const char *board;
 	const char *format;
+	int lng;
 	int noboard;
 	uint32_t id;
 };

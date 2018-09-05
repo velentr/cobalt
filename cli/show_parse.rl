@@ -27,7 +27,7 @@
 	}
 
 	action setlong {
-		cmd->format = "%i\n%l\n";
+		cmd->lng = 1;
 	}
 
 	action setformat {
@@ -61,7 +61,8 @@ int show_parse(int argc, const char *argv[], struct show_cmd *cmd)
 	int cs;
 
 	cmd->board = NULL;
-	cmd->format = "  %i  %s\n";
+	cmd->format = NULL;
+	cmd->lng = 0;
 	cmd->noboard = 0;
 	cmd->id = 0;
 
