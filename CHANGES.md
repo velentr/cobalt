@@ -7,6 +7,8 @@ All changes between releases will be documented in this file.
  - Implemented loading the board during a query, so the `co_query_getboard()`
    functions will work.
  - Format `%b` is used by `cobalt show` to print the board for the task.
+ - Library API for reading all tasks.
+ - If no board or task is provided to `cobalt show`, then all tasks are printed.
 
 ### Changed
  - Converted `testbench.pl` to `run-test.pl`, which runs a single test. This

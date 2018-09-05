@@ -124,21 +124,21 @@ static int show_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (cmd.board == NULL && cmd.id == 0) {
-		eprint("must supply board to show from\n");
-		return EXIT_FAILURE;
-	}
-
 	co = co_open(".", &err);
 	if (co == NULL) {
 		eprint("cannot open database: %s\n", strerror(err));
 		return EXIT_FAILURE;
 	}
 
-	if (cmd.board != NULL)
+	if (cmd.board == NULL && cmd.id == 0) {
+		cmd.format = "%b\t %i  %s\n";
+		cmd.noboard = 1;
+		rc = co_get_all(co, &q);
+	} else if (cmd.board != NULL) {
 		rc = co_get_board(co, cmd.board, &q);
-	else
+	} else {
 		rc = co_get_task(co, cmd.id, &q);
+	}
 
 	if (rc == CO_ENOERR) {
 		rc = EXIT_SUCCESS;

@@ -347,6 +347,34 @@ int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q)
 	}
 }
 
+int co_get_all(struct cobalt *co, struct cobalt_query **q)
+{
+	int rc;
+	struct list_elem *result;
+	struct co_db_op get_board[] = {
+		OP_SCAT(0, dstr(&co->path), dstrlen(&co->path)),
+		MACRO_SCATL(0, "/obj/"),
+		OP_QILD(0),
+		OP_QIRD,
+		OP_QMAP,
+		OP_QBD,
+	};
+
+	rc = co_db_run(&co->db, get_board, lengthof(get_board));
+	if (rc == CO_ENOERR) {
+		if (list_isempty(&co->db.query)) {
+			*q = NULL;
+		} else {
+			result = list_popfront(&co->db.query);
+			*q = containerof(result, struct cobalt_query, le);
+		}
+		return CO_ENOERR;
+	} else {
+		co->err = rc;
+		return rc;
+	}
+}
+
 struct cobalt_query *co_query_getnext(struct cobalt *co, struct cobalt_query *q)
 {
 	struct cobalt_query *result;
