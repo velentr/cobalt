@@ -63,10 +63,12 @@ static int add_main(int argc, const char *argv[])
 		rc = editstr_create(&data, NULL, 0);
 		if (rc == ECANCELED) {
 			fprintf(stderr, "editor string empty, not adding\n");
+			co_free(co);
 			return EXIT_FAILURE;
 		} else if (rc != 0) {
 			eprint("cannot create data from editor: %s\n",
 					strerror(rc));
+			co_free(co);
 			return EXIT_FAILURE;
 		}
 		message = dstr(&data);
