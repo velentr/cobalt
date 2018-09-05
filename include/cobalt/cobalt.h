@@ -30,52 +30,52 @@ struct cobalt_query;
 #define CO_DEL_STRICTGC	(1 << 1)
 
 /* get version of compiled library */
-void co_version(int *major, int *minor, int *patch) CO_API;
+CO_API void co_version(int *major, int *minor, int *patch);
 
 /* get error string from the last cobalt operation */
-const char *co_strerror(struct cobalt *co) CO_API;
+CO_API const char *co_strerror(struct cobalt *co);
 
 /* initialize a cobalt task list in the given directory */
-struct cobalt *co_init(const char *path, int *err) CO_API;
+CO_API struct cobalt *co_init(const char *path, int *err);
 
 /* open a connection to a cobalt database */
-struct cobalt *co_open(const char *path, int *err) CO_API;
+CO_API struct cobalt *co_open(const char *path, int *err);
 
 /* free all memory used by the given cobalt database */
-void co_free(struct cobalt *co) CO_API;
+CO_API void co_free(struct cobalt *co);
 
 /* add a new task to the cobalt database */
-uint32_t co_add(struct cobalt *co, const char *data, size_t len,
-		const char *board) CO_API;
+CO_API uint32_t co_add(struct cobalt *co, const char *data, size_t len,
+		const char *board);
 
 /* modify an existing attribute */
-int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
-		const char *newval) CO_API;
+CO_API int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
+		const char *newval);
 
 /* set the data for the given command */
-int co_mod_data(struct cobalt *co, uint32_t id, const char *data, size_t len)
-	CO_API;
+CO_API int co_mod_data(struct cobalt *co, uint32_t id, const char *data,
+		size_t len);
 
 /* delete an existing cobalt entry */
-int co_delete(struct cobalt *co, uint32_t id, uint32_t flags) CO_API;
+CO_API int co_delete(struct cobalt *co, uint32_t id, uint32_t flags);
 
 /* run garbage collection on the cobalt task database */
-int co_gc(struct cobalt *co, uint32_t flags) CO_API;
+CO_API int co_gc(struct cobalt *co, uint32_t flags);
 
 /* get the task with the given id */
-int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q) CO_API;
+CO_API int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q);
 
 /* get all tasks from the given board */
-int co_get_board(struct cobalt *co, const char *board,
-		struct cobalt_query **q) CO_API;
+CO_API int co_get_board(struct cobalt *co, const char *board,
+		struct cobalt_query **q);
 
 /* reading the results of a query */
-struct cobalt_query *co_query_getnext(struct cobalt *co,
-		struct cobalt_query *q) CO_API;
-uint32_t co_query_getid(struct cobalt_query *q) CO_API;
-const char *co_query_getboard(struct cobalt_query *q) CO_API;
-void co_query_getdata(struct cobalt_query *q, const char **data,
-		size_t *len) CO_API;
+CO_API struct cobalt_query *co_query_getnext(struct cobalt *co,
+		struct cobalt_query *q);
+CO_API uint32_t co_query_getid(struct cobalt_query *q);
+CO_API const char *co_query_getboard(struct cobalt_query *q);
+CO_API void co_query_getdata(struct cobalt_query *q, const char **data,
+		size_t *len);
 
 
 #endif /* end of include guard: COBALT_H_ */
