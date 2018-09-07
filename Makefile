@@ -21,10 +21,10 @@ INSTALL ?= install
 INSTALL_PROGRAM := $(INSTALL)
 INSTALL_DATA := $(INSTALL) -m 644
 INSTALL_DIR := $(INSTALL) -d
-prefix ?= $(DESTDIR)/usr/local
-libdir ?= $(prefix)/lib
-bindir ?= $(prefix)/bin
-includedir ?= $(prefix)/include/cobalt
+prefix ?= /usr/local
+libdir ?= $(DESTDIR)$(prefix)/lib
+bindir ?= $(DESTDIR)$(prefix)/bin
+includedir ?= $(DESTDIR)$(prefix)/include/cobalt
 
 # shared variables need immediate assignment since $(dir) will change between
 # directories
