@@ -522,9 +522,17 @@ void co_db_init(struct co_db *db)
 
 void co_db_free(struct co_db *db)
 {
+	struct cobalt_query *q;
+	struct list_elem *le;
+
 	assert(db != NULL);
 	assert(db->qdir == NULL);
-	(void)db;
+
+	while (!list_isempty(&db->query)) {
+		le = list_popfront(&db->query);
+		q = containerof(le, struct cobalt_query, le);
+		co_db_query_free(q);
+	}
 }
 
 void co_db_query_free(struct cobalt_query *q)
