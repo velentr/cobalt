@@ -31,7 +31,8 @@ includedir ?= $(DESTDIR)$(prefix)/include/cobalt
 cgen :=
 test :=
 cover :=
-doc :=
+pubdoc :=
+prvdoc :=
 
 sub := cli doc lib lib/test test
 
@@ -46,7 +47,7 @@ testres := $(test:=.result)
 # turn off warnings for generated C files
 $(foreach R,$(cgen),$(eval CFLAGS_$R := -w))
 
-all: $(cli) $(lib)
+all: $(cli) $(lib) $(pubdoc)
 	@echo finished building cobalt $(version)
 
 install: $(cli) $(lib)
@@ -80,7 +81,7 @@ cover: LDFLAGS += -lgcov
 cover: clean test
 	$(GCOV) $(cover)
 
-doc: $(doc)
+doc: $(prvdoc) $(pubdoc)
 
 -include $(dep) $(clidep) $(libdep) $(testdep)
 
@@ -118,14 +119,19 @@ clean-test:
 clean: clean-test
 	@echo cleaning...
 	rm -f $(cliobj) $(clidep) $(clisrc) $(cli) $(lib) $(libobj) $(libdep) \
-		$(obj) $(dep) $(testobj) $(testdep) $(testbin) $(doc)
+		$(obj) $(dep) $(testobj) $(testdep) $(testbin) $(prvdoc) \
+		$(pubdoc)
 	find -type f \( -name '*.gcda' -o -name '*.gcno' -o -name '*.gcov' \) \
 		-exec rm {} +
 
 # need the second expansion here to reference $@ in the prerequisite list
 .SECONDEXPANSION:
-$(doc): $$@.txt $(docconf)
+$(pubdoc): $$@.txt $(docconf)
 	@echo "DOC	$@"
+	$(A2X) $(DOCFLAGS) $<
+
+$(prvdoc): $$@.txt $(docconf)
+	@echo "DOC*	$@"
 	$(A2X) $(DOCFLAGS) $<
 
 .PHONY: all clean clean-test cover doc install retest test uninstall
