@@ -324,8 +324,9 @@ static int co_db_query_map_run(struct co_db *db)
 
 	rc = fstat(fd, &st);
 	if (rc < 0) {
+		rc = errno;
 		close(fd);
-		return errno;
+		return rc;
 	}
 
 	if (st.st_size > 0) {
