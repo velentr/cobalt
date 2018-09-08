@@ -7,6 +7,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 
 #include "list.h"
@@ -60,6 +62,18 @@ int __wrap_open(const char *path, int flags, mode_t mode)
 	}
 }
 
+int __openat_fail = 0;
+extern int __real_openat(int dirfd, const char *path, int flags, mode_t mode);
+int __wrap_openat(int dirfd, const char *path, int flags, mode_t mode)
+{
+	if (__openat_fail) {
+		errno = __openat_fail;
+		return -1;
+	} else {
+		return __real_openat(dirfd, path, flags, mode);
+	}
+}
+
 int __write_fail = 0;
 size_t __write_partial = 0;
 extern ssize_t __real_write(int fd, const void *buf, size_t count);
@@ -108,6 +122,44 @@ int __wrap_unlink(const char *path)
 		return -1;
 	} else {
 		return __real_unlink(path);
+	}
+}
+
+int __readdir_fail = 0;
+extern struct dirent *__real_readdir(DIR *dirp);
+struct dirent *__wrap_readdir(DIR *dirp)
+{
+	if (__readdir_fail) {
+		errno = __readdir_fail;
+		return NULL;
+	} else {
+		return __real_readdir(dirp);
+	}
+}
+
+int __fstat_fail = 0;
+extern int __real_fstat(int fd, struct stat *st);
+int __wrap_fstat(int fd, struct stat *st)
+{
+	if (__fstat_fail) {
+		errno = __fstat_fail;
+		return -1;
+	} else {
+		return __real_fstat(fd, st);
+	}
+}
+
+int __mmap_fail = 0;
+extern void *__real_mmap(void *addr, size_t len, int prot, int flags, int fd,
+		off_t offset);
+void *__wrap_mmap(void *addr, size_t len, int prot, int flags, int fd,
+		off_t offset)
+{
+	if (__mmap_fail) {
+		errno = __mmap_fail;
+		return MAP_FAILED;
+	} else {
+		return __real_mmap(addr, len, prot, flags, fd, offset);
 	}
 }
 

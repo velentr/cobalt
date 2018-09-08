@@ -34,6 +34,7 @@ test += $(dir)/list-stack-front
 testlib := $(dir)/testlib
 LDFLAGS_test := -Wl,--wrap=malloc,--wrap=realloc,--wrap=mkdir,--wrap=open
 LDFLAGS_test += -Wl,--wrap=write,--wrap=rename,--wrap=symlink,--wrap=unlink
+LDFLAGS_test += -Wl,--wrap=readdir,--wrap=openat,--wrap=fstat,--wrap=mmap
 
 cover += dstring list
 
