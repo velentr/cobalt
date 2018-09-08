@@ -478,11 +478,18 @@ static void co_db_revert_opcode(struct co_db *db,
 
 int co_db_run(struct co_db *db, const struct co_db_op * const ops, size_t nops)
 {
+	struct list_elem *le;
+	struct cobalt_query *q;
 	size_t i;
 	int j;
 	int rc;
 
-	list_init(&db->query);
+	/* clear all previous queries */
+	while (!list_isempty(&db->query)) {
+		le = list_popfront(&db->query);
+		q = containerof(le, struct cobalt_query, le);
+		co_db_query_free(q);
+	}
 
 	/* run each op code, checking for errors */
 	for (db->ip = 0; db->ip < nops;) {
@@ -519,6 +526,7 @@ void co_db_init(struct co_db *db)
 		dstrempty(&db->str[i]);
 
 	db->qdir = NULL;
+	list_init(&db->query);
 }
 
 void co_db_free(struct co_db *db)
