@@ -17,6 +17,10 @@ All changes between releases will be documented in this file.
  - Database cleanup will also cleanup all unused query results; this allows
    callers to stop reading queries and exit without leaking memory.
 
+### Fixed
+ - Memory leak when running the `gc` CLI command.
+ - Use of uninitialized list when freeing an unused database.
+
 ## 0.1.0 (2018/09/01)
 ### Added
  - Man page for `cobalt` command using `asciidoc(1)`, along with `Makefile`
