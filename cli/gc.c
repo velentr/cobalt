@@ -46,9 +46,12 @@ static int gc_main(int argc, const char *argv[])
 	rc = co_gc(co, cmd.strict ? CO_GC_STRICT : 0);
 	if (rc != CO_ENOERR && cmd.strict) {
 		eprint("garbage collection failed: %s\n", co_strerror(co));
-		return EXIT_FAILURE;
+		rc = EXIT_FAILURE;
+	} else {
+		rc = EXIT_SUCCESS;
 	}
 
+	co_free(co);
 	return EXIT_SUCCESS;
 }
 
