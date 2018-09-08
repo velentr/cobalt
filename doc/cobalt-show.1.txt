@@ -1,0 +1,83 @@
+COBALT-SHOW(1)
+==============
+:doctype: manpage
+
+NAME
+----
+cobalt-show - show tasks from the database
+
+SYNOPSIS
+--------
+*cobalt show* ['<options>'] ['@<board>|<id>']
+
+DESCRIPTION
+-----------
+Show tasks from the cobalt database.
+
+The *show* command is used for querying tasks from the database and showing
+information about the tasks. If no arguments are provided, then all tasks in the
+database are shown. If a board is provided using the '@<board>' argument, then
+all tasks from the given board are shown. If a numeric task ID is provided with
+'<id>', then only that task is shown. At most one of '@<board>' or '<id>' may be
+provided.
+
+Tasks are shown in an order that depends on the filesystem implementation; do
+not rely on any ordering in the output.
+
+OPTIONS
+-------
+@<board>::
+	All tasks categorized on '<board>' will be printed. The output will
+	start by printing '@<board>' (unless '--no-board' is specified),
+	followed by the formatted task data.
+
+<id>::
+	The task with ID '<id>' will be printed. '<id>' must be an 8-character
+	hexadecimal string representing the 32-bit ID of the task (i.e. it must
+	match the regex `[0-9a-fA-F]{8}`).
+
+-f <format>, --format <format>::
+	Use '<format>' as the format string for printing each task's
+	information. Each character in the format string is printed as-is,
+	except for escaped characters (e.g. '\t') and format characters (e.g.
+	'%s'). Interpreted sequences are:
+	\0;;
+		nil byte
+	\n;;
+		linefeed
+	\r;;
+		carriage return
+	\t;;
+		horizontal tab
+	\\;;
+		literal backslash
+	\%;;
+		literal percent symbol
+	%b;;
+		board that the task is on
+	%i;;
+		numeric ID of the task
+	%l;;
+		full text of the task description
+	%s;;
+		shortened text of the task description (i.e. up to the first
+		newline)
+
+-l, --long::
+	Print the long form of the task data when using default format strings.
+	Note that this cannot be used when '--format' is specified.
+
+-n, --no-board::
+	Do not print the board name before printing task data. This only affects
+	behavior when '@<board>' is specified for querying tasks.
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:

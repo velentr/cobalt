@@ -101,6 +101,7 @@ static void show_printf(const char *fmt, struct cobalt_query *task)
 				putchar('\t');
 				break;
 			case '\\':
+			case '%':
 			default:
 				putchar(*fmt);
 				break;

@@ -1,6 +1,10 @@
 # Changelog
 All changes between releases will be documented in this file.
 
+## Unreleased
+### Added
+ - Additional manpage documentation for CLI commands.
+
 ## 0.2.0 (2018/09/08)
 ### Added
  - Install and uninstall targets to Makefile.
