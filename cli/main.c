@@ -8,17 +8,26 @@
 
 #include <cobalt/cobalt.h>
 
+#include "argparse.h"
 #include "modules.h"
 #include "util.h"
 
 int main(int argc, const char *argv[])
 {
 	struct module *mod;
+	int rc;
 
 	if (argc > 1) {
 		mod = module_get(argv[1]);
-		if (mod != NULL)
-			return mod->main(argc - 2, argv + 2);
+		if (mod != NULL) {
+			rc = arg_parse_all(argv + 2, mod->args);
+			if (rc != 0) {
+				mod->usage();
+				return EXIT_FAILURE;
+			} else {
+				return mod->main();
+			}
+		}
 	}
 	return EXIT_FAILURE;
 }

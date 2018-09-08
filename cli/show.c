@@ -10,8 +10,8 @@
 
 #include <cobalt/cobalt.h>
 
+#include "argparse.h"
 #include "modules.h"
-#include "show.h"
 #include "util.h"
 
 static void show_usage(void)
@@ -34,6 +34,7 @@ static void show_usage_long(void)
 	fprintf(stderr, "\t<board>\t\tboard to show all tasks from\n");
 	fprintf(stderr, "\t<id>\t\tnumeric id of the board to show\n");
 }
+
 static void show_printf(const char *fmt, struct cobalt_query *task)
 {
 	enum { NORMAL, FORMAT, ESCAPE } state;
@@ -110,19 +111,78 @@ static void show_printf(const char *fmt, struct cobalt_query *task)
 	}
 }
 
-static int show_main(int argc, const char *argv[])
+static struct arg lng;
+static struct arg format = {
+	.name = "format",
+	.desc = "string used to specify output formatting",
+	.type = ARG_STRING,
+	.string = {
+		.lmatch = "format",
+		.smatch = 'f',
+	},
+	.exclude = {
+		&lng,
+		NULL
+	}
+};
+static struct arg lng = {
+	.name = "long",
+	.desc = "print the full task data",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "long",
+		.smatch = 'l',
+		.value = 0,
+	},
+	.exclude = {
+		&format,
+		NULL
+	}
+};
+
+static struct arg board;
+static struct arg noboard;
+static struct arg id = {
+	.name = "id",
+	.desc = "numeric id of the board to show",
+	.type = ARG_ID,
+	.exclude = {
+		&board,
+		&noboard,
+		NULL
+	}
+};
+static struct arg board = {
+	.name = "board",
+	.desc = "board to show all tasks from",
+	.type = ARG_BOARD,
+	.exclude = {
+		&id,
+		NULL
+	}
+};
+static struct arg noboard = {
+	.name = "no-board",
+	.desc = "do not print the board name",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "no-board",
+		.smatch = 'n',
+		.value = 0,
+	},
+	.exclude = {
+		&id,
+		NULL
+	}
+};
+
+static int show_main(void)
 {
-	struct show_cmd cmd;
 	struct cobalt *co;
 	struct cobalt_query *q;
+	const char *fmt;
 	int rc;
 	int err;
-
-	rc = show_parse(argc, argv, &cmd);
-	if (rc != 0) {
-		show_usage();
-		return EXIT_FAILURE;
-	}
 
 	co = co_open(".", &err);
 	if (co == NULL) {
@@ -130,40 +190,43 @@ static int show_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (cmd.board == NULL && cmd.id == 0) {
-		if (cmd.format == NULL) {
-			if (cmd.lng)
-				cmd.format = "%b\t %i\n%l";
-			else
-				cmd.format = "%b\t %i  %s\n";
-		}
+	if (!board.valid && !id.valid && !format.valid && !lng.boolean.value) {
+		fmt = "%b\t %i  %s\n";
 		rc = co_get_all(co, &q);
-	} else if (cmd.board != NULL) {
-		if (cmd.format == NULL) {
-			if (cmd.lng)
-				cmd.format = "%i\n%l\n";
-			else
-				cmd.format = "  %i  %s\n";
-		}
-		rc = co_get_board(co, cmd.board, &q);
+	} else if (!board.valid && !id.valid && !format.valid) {
+		fmt = "%b\t %i\n%l";
+		rc = co_get_all(co, &q);
+	} else if (!board.valid && !id.valid) {
+		fmt = format.string.value;
+		rc = co_get_all(co, &q);
+	} else if (!id.valid && !format.valid && !lng.boolean.value) {
+		fmt = "  %i  %s\n";
+		rc = co_get_board(co, board.board.value, &q);
+	} else if (!id.valid && !format.valid) {
+		fmt = "%i\n%l\n";
+		rc = co_get_board(co, board.board.value, &q);
+	} else if (!id.valid) {
+		fmt = format.string.value;
+		rc = co_get_board(co, board.board.value, &q);
+	} else if (!format.valid && !lng.boolean.value) {
+		fmt = "%i  %s\n";
+		rc = co_get_task(co, id.id.value, &q);
+	} else if (!format.valid) {
+		fmt = "%i\n%l\n";
+		rc = co_get_task(co, id.id.value, &q);
 	} else {
-		if (cmd.format == NULL) {
-			if (cmd.lng)
-				cmd.format = "%i\n%l\n";
-			else
-				cmd.format = "  %i  %s\n";
-		}
-		rc = co_get_task(co, cmd.id, &q);
+		fmt = format.board.value;
+		rc = co_get_task(co, id.id.value, &q);
 	}
 
 	if (rc == CO_ENOERR) {
 		rc = EXIT_SUCCESS;
 
-		if (cmd.board != NULL && !cmd.noboard)
-			printf("@%s\n", cmd.board);
+		if (board.valid && !noboard.boolean.value)
+			printf("@%s\n", board.board.value);
 
 		for (; q != NULL; q = co_query_getnext(co, q))
-			show_printf(cmd.format, q);
+			show_printf(fmt, q);
 	} else {
 		eprint("cannot query database: %s\n", co_strerror(co));
 		rc = EXIT_FAILURE;
@@ -179,6 +242,14 @@ static struct module show_module = {
 	.main = show_main,
 	.usage = show_usage,
 	.usage_long = show_usage_long,
+	.args = {
+		&format,
+		&lng,
+		&board,
+		&id,
+		&noboard,
+		NULL
+	}
 };
 
 MODULE_INIT(show_module)

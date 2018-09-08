@@ -7,8 +7,8 @@
 
 #include <cobalt/cobalt.h>
 
+#include "argparse.h"
 #include "modules.h"
-#include "version.h"
 
 static void version_usage(void)
 {
@@ -23,19 +23,23 @@ static void version_usage_long(void)
 			"rather than the app\n");
 }
 
-static int version_main(int argc, const char *argv[])
+static struct arg library = {
+	.name = "library",
+	.desc = "print version of the linked library rather than the app",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "library",
+		.smatch = 'l',
+		.value = 0,
+	},
+	.exclude = { NULL }
+};
+
+static int version_main(void)
 {
-	struct version_cmd cmd;
 	int major, minor, patch;
-	int rc;
 
-	rc = version_parse(argc, argv, &cmd);
-	if (rc != 0) {
-		version_usage();
-		return EXIT_FAILURE;
-	}
-
-	if (cmd.library) {
+	if (library.boolean.value) {
 		co_version(&major, &minor, &patch);
 	} else {
 		major = CO_MAJOR;
@@ -54,6 +58,7 @@ static struct module version_module = {
 	.main = version_main,
 	.usage = version_usage,
 	.usage_long = version_usage_long,
+	.args = { &library, NULL }
 };
 
 MODULE_INIT(version_module)

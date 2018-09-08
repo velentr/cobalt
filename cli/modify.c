@@ -11,9 +11,9 @@
 
 #include <cobalt/cobalt.h>
 
+#include "argparse.h"
 #include "editstr.h"
 #include "modules.h"
-#include "modify.h"
 #include "util.h"
 
 static void modify_usage(void)
@@ -39,13 +39,64 @@ static void modify_usage_long(void)
 	fprintf(stderr, "\t<board>\tboard to which the task is moved\n");
 }
 
-static int modify_do_delete(struct cobalt *co, uint32_t id, int gc)
+struct arg delete;
+struct arg edit;
+struct arg nogc;
+struct arg destination = {
+	.name = "destination",
+	.desc = "board to which the task is moved",
+	.type = ARG_BOARD,
+	.exclude = { &delete, &nogc, &edit, NULL }
+};
+struct arg delete = {
+	.name = "delete",
+	.desc = "delete the specified task",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "delete",
+		.smatch = 'd',
+	},
+	.exclude = { &edit, &destination, NULL }
+};
+struct arg nogc = {
+	.name = "no-gc",
+	.desc = "do not run garbage collection after deletion",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "no-gc",
+		.smatch = 'n',
+	},
+	.exclude = { &edit, &destination, NULL }
+};
+struct arg edit = {
+	.name = "edit",
+	.desc = "edit the task's data using $EDITOR",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "edit",
+		.smatch = 'e',
+	},
+	.exclude = { &delete, &nogc, &destination, NULL }
+};
+
+struct arg id = {
+	.name = "id",
+	.desc = "numeric id of the task to modify",
+	.type = ARG_ID,
+	.exclude = { NULL }
+};
+
+static int modify_do_delete(struct cobalt *co, uint32_t id)
 {
 	int rc;
 
 	assert(id != 0);
 
-	rc = co_delete(co, id, gc ? CO_DEL_NGC : 0);
+	if (nogc.valid && nogc.boolean.value)
+		rc = co_delete(co, id, CO_DEL_NGC);
+	else
+		rc = co_delete(co, id, 0);
+
 	if (rc != CO_ENOERR) {
 		eprint("cannot delete task %08x: %s\n", id, co_strerror(co));
 		return EXIT_FAILURE;
@@ -115,20 +166,13 @@ static int modify_do_edit(struct cobalt *co, uint32_t id)
 	return rc;
 }
 
-static int modify_main(int argc, const char *argv[])
+static int modify_main(void)
 {
-	struct modify_cmd cmd;
 	struct cobalt *co;
 	int rc;
 	int err;
 
-	rc = modify_parse(argc, argv, &cmd);
-	if (rc != 0) {
-		modify_usage();
-		return EXIT_FAILURE;
-	}
-
-	if (cmd.id == 0) {
+	if (!id.valid) {
 		eprint("id required to modify task\n");
 		return EXIT_FAILURE;
 	}
@@ -139,12 +183,12 @@ static int modify_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (cmd.del) {
-		rc = modify_do_delete(co, cmd.id, cmd.nogc);
-	} else if (cmd.edit) {
-		rc = modify_do_edit(co, cmd.id);
-	} else if (cmd.board != NULL) {
-		rc = modify_do_move(co, cmd.id, cmd.board);
+	if (delete.valid && delete.boolean.value) {
+		rc = modify_do_delete(co, id.id.value);
+	} else if (edit.valid) {
+		rc = modify_do_edit(co, id.id.value);
+	} else if (destination.valid) {
+		rc = modify_do_move(co, id.id.value, destination.board.value);
 	} else {
 		eprint("invalid commandline\n");
 		rc = EXIT_FAILURE;
@@ -161,6 +205,7 @@ static struct module modify_module = {
 	.main = modify_main,
 	.usage = modify_usage,
 	.usage_long = modify_usage_long,
+	.args = { &delete, &edit, &nogc, &id, &destination, NULL }
 };
 
 MODULE_INIT(modify_module)

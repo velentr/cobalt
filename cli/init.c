@@ -8,7 +8,7 @@
 
 #include <cobalt/cobalt.h>
 
-#include "init.h"
+#include "argparse.h"
 #include "modules.h"
 
 static void init_usage(void)
@@ -25,22 +25,25 @@ static void init_usage_long(void)
 	fprintf(stderr, "\t<path>\tpath to cobalt database to initialize\n");
 }
 
-static int init_main(int argc, const char *argv[])
+struct arg path = {
+	.name = "path",
+	.desc = "path to the cobalt database to initialize",
+	.type = ARG_BARE,
+	.exclude = { NULL }
+};
+
+static int init_main(void)
 {
 	struct cobalt *co;
-	struct init_cmd init;
+	const char *p;
 	int rc;
 
-	rc = init_parse(argc, argv, &init);
-	if (rc != 0) {
-		init_usage();
-		return EXIT_FAILURE;
-	}
+	if (path.valid)
+		p = path.bare.value;
+	else
+		p = ".";
 
-	if (init.path == NULL)
-		init.path = ".";
-
-	co = co_init(init.path, &rc);
+	co = co_init(p, &rc);
 	if (co == NULL) {
 		eprint("cannot create cobalt database: %s\n", strerror(rc));
 		return EXIT_FAILURE;
@@ -56,6 +59,7 @@ static struct module init_module = {
 	.main = init_main,
 	.usage = init_usage,
 	.usage_long = init_usage_long,
+	.args = { NULL }
 };
 
 MODULE_INIT(init_module)

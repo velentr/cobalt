@@ -8,7 +8,6 @@
 
 #include <cobalt/cobalt.h>
 
-#include "add.h"
 #include "dstring.h"
 #include "editstr.h"
 #include "modules.h"
@@ -31,24 +30,35 @@ static void add_usage_long(void)
 	fprintf(stderr, "\t<board>\tboard to which the task is added\n");
 }
 
-static int add_main(int argc, const char *argv[])
+struct arg message = {
+	.name = "message",
+	.desc = "message to use as the data for the new task",
+	.type = ARG_STRING,
+	.string = {
+		.lmatch = "message",
+		.smatch = 'm',
+	},
+	.exclude = { NULL }
+};
+
+struct arg board = {
+	.name = "board",
+	.desc = "board to which the task is added",
+	.type = ARG_BOARD,
+	.exclude = { NULL }
+};
+
+static int add_main(void)
 {
 	struct dstring data = DSTR_EMPTY;
-	struct add_cmd cmd;
 	struct cobalt *co;
-	const char *message;
+	const char *msg;
 	size_t len;
 	uint32_t id;
 	int err;
 	int rc;
 
-	rc = add_parse(argc, argv, &cmd);
-	if (rc != 0) {
-		add_usage();
-		return EXIT_FAILURE;
-	}
-
-	if (cmd.board == NULL) {
+	if (!board.valid) {
 		eprint("board required when adding task\n");
 		return EXIT_FAILURE;
 	}
@@ -59,7 +69,7 @@ static int add_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (cmd.message == NULL) {
+	if (!message.valid) {
 		rc = editstr_create(&data, NULL, 0);
 		if (rc == ECANCELED) {
 			fprintf(stderr, "editor string empty, not adding\n");
@@ -71,14 +81,14 @@ static int add_main(int argc, const char *argv[])
 			co_free(co);
 			return EXIT_FAILURE;
 		}
-		message = dstr(&data);
+		msg = dstr(&data);
 		len = dstrlen(&data);
 	} else {
-		message = cmd.message;
-		len = strlen(message);
+		msg = message.string.value;
+		len = strlen(message.string.value);
 	}
 
-	id = co_add(co, message, len, cmd.board);
+	id = co_add(co, msg, len, board.board.value);
 	if (id == 0) {
 		eprint("cannot add object: %s\n", co_strerror(co));
 		rc = EXIT_FAILURE;
@@ -98,6 +108,7 @@ static struct module add_module = {
 	.main = add_main,
 	.usage = add_usage,
 	.usage_long = add_usage_long,
+	.args = { &message, &board, NULL }
 };
 
 MODULE_INIT(add_module)

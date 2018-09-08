@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 
-#include "help.h"
+#include "argparse.h"
 #include "list.h"
 #include "modules.h"
 
@@ -43,30 +43,40 @@ static void help_all(void)
 			"information for <command>\n");
 }
 
-static int help_main(int argc, const char *argv[])
+static struct arg shortusage = {
+	.name = "short",
+	.desc = "print shortened usage message",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "short",
+		.smatch = 's',
+	},
+	.exclude = { NULL }
+};
+
+static struct arg command = {
+	.name = "command",
+	.desc = "print help information for <command>",
+	.type = ARG_BARE,
+	.exclude = { NULL }
+};
+
+static int help_main(void)
 {
-	struct help_cmd help;
 	struct module *m;
-	int rc;
 
-	rc = help_parse(argc, argv, &help);
-	if (rc != 0) {
-		help_usage();
-		return EXIT_FAILURE;
-	}
-
-	if (help.command == NULL) {
+	if (!command.valid) {
 		help_all();
 		return EXIT_SUCCESS;
 	}
 
-	m = module_get(help.command);
+	m = module_get(command.bare.value);
 	if (m == NULL) {
-		eprint("unknown command: %s\n", help.command);
+		eprint("unknown command: %s\n", command.bare.value);
 		return EXIT_FAILURE;
 	}
 
-	if (help.shortusage)
+	if (shortusage.valid && shortusage.boolean.value)
 		m->usage();
 	else
 		m->usage_long();
@@ -80,6 +90,7 @@ static struct module help_module = {
 	.main = help_main,
 	.usage = help_usage,
 	.usage_long = help_usage_long,
+	.args = { &shortusage, &command, NULL }
 };
 
 MODULE_INIT(help_module)

@@ -9,7 +9,7 @@
 
 #include <cobalt/cobalt.h>
 
-#include "gc.h"
+#include "argparse.h"
 #include "modules.h"
 #include "util.h"
 
@@ -27,15 +27,21 @@ static void gc_usage_long(void)
 			"garbage collection fails\n");
 }
 
-static int gc_main(int argc, const char *argv[])
+static struct arg strict = {
+	.name = "strict",
+	.desc = "return an error if any part of the garbage collection fails",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "strict",
+		.smatch = 's',
+	},
+	.exclude = { NULL }
+};
+
+static int gc_main(void)
 {
-	struct gc_cmd cmd;
 	struct cobalt *co;
 	int rc;
-
-	rc = gc_parse(argc, argv, &cmd);
-	if (rc != 0)
-		return EXIT_FAILURE;
 
 	co = co_open(".", &rc);
 	if (co == NULL) {
@@ -43,8 +49,12 @@ static int gc_main(int argc, const char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	rc = co_gc(co, cmd.strict ? CO_GC_STRICT : 0);
-	if (rc != CO_ENOERR && cmd.strict) {
+	if (strict.valid && strict.boolean.value)
+		rc = co_gc(co, CO_GC_STRICT);
+	else
+		rc = co_gc(co, 0);
+
+	if (rc != CO_ENOERR && strict.valid && strict.boolean.value) {
 		eprint("garbage collection failed: %s\n", co_strerror(co));
 		rc = EXIT_FAILURE;
 	} else {
@@ -61,6 +71,10 @@ static struct module gc_module = {
 	.main = gc_main,
 	.usage = gc_usage,
 	.usage_long = gc_usage_long,
+	.args = {
+		&strict,
+		NULL
+	}
 };
 
 MODULE_INIT(gc_module)

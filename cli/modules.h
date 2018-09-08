@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include "argparse.h"
 #include "list.h"
 #include "util.h"
 
@@ -16,9 +17,10 @@ struct module {
 	struct list_elem le;
 	const char *name;
 	const char *desc;
-	int (*const main)(int, const char **);
+	int (*const main)(void);
 	void (*const usage)(void);
 	void (*const usage_long)(void);
+	struct arg *args[];
 };
 
 /* list of commands, initialized at startup using the MODULE_INIT() macro */
