@@ -16,6 +16,7 @@ All changes between releases will be documented in this file.
    results.
  - Database cleanup will also cleanup all unused query results; this allows
    callers to stop reading queries and exit without leaking memory.
+ - Refactored argument parsing to remove a lot of boilerplate.
 
 ### Fixed
  - Memory leak when running the `gc` CLI command.
