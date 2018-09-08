@@ -13,7 +13,7 @@
 
 /* major, minor, and patch version numbers */
 #define CO_MAJOR	0
-#define CO_MINOR	1
+#define CO_MINOR	2
 #define CO_PATCH	0
 
 #define CO_API		__attribute__ ((visibility ("default")))

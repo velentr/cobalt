@@ -1,7 +1,7 @@
 # Changelog
 All changes between releases will be documented in this file.
 
-## Unreleased
+## 0.2.0 (2018/09/08)
 ### Added
  - Install and uninstall targets to Makefile.
  - Implemented loading the board during a query, so the `co_query_getboard()`
