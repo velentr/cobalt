@@ -8,7 +8,7 @@ cobalt-show - show tasks from the database
 
 SYNOPSIS
 --------
-*cobalt show* ['<options>'] ['@<board>|<id>']
+*cobalt show* ['<options>'] ['@<board>'|'<id>']
 
 DESCRIPTION
 -----------

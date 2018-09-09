@@ -1,0 +1,66 @@
+COBALT-MODIFY(1)
+================
+:doctype: manpage
+
+NAME
+----
+cobalt-modify - modify a task's attributes and data
+
+SYNOPSIS
+--------
+*cobalt modify* ['<options>'] '<id>' ['@<destination>'|'--delete'|'--edit']
+
+DESCRIPTION
+-----------
+Modify task attributes and data in the database.
+
+The *modify* command is used to edit and delete tasks from the database. The
+'<id>' argument is required to specify which task to modify. One of
+'@<destination>', '--delete', or '--edit' must be specified as well. The
+'@<destination>' option causes the specified task to be moved to board
+'<destination>'. The '--delete' option deletes the task from the database. The
+'--edit' option causes the task's data to be opened in the user's editor, and
+the saved result will be set to the task's data.
+
+OPTIONS
+-------
+<id>::
+	Specifies the ID of the task to modify. '<id>' must be an 8-character
+	hexadecimal string representing the 32-bit ID of the task (i.e. it must
+	match the regex `[0-9a-fA-F]{8}`).
+
+@<destination>::
+	Move the task to the '<destination>' board.
+
+-d, --delete::
+	Remove the task from the database.
+
+-e, --edit::
+	Open the task's data in the user's editor. When the editor is closed,
+	whatever data is saved will replace the task's data. If the editor
+	returns a non-zero value or the resulting file contains only blank
+	lines, then the operation is cancelled and the task is not modified.
+
+-n, --no-gc::
+	When deleting a task, do not run garbage collection. Instead of deleting
+	the task, it will be removed from all indices in the database and moved
+	to the garbage collection area. The data will still remain on disk until
+	it is cleaned up by the next garbage collection. Garbage collection may
+	be invoked with **cobalt-gc**(1). This option is only valid when the
+	'--delete' option is specified.
+
+ENVIRONMENT VARIABLES
+---------------------
+The editor used to edit the task's data will be chosen from the *EDITOR*
+environment variable.
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
