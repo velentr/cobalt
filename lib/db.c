@@ -468,9 +468,6 @@ static void co_db_revert_opcode(struct co_db *db,
 	case CO_DB_QUERY_INDEX_LOAD:
 		co_db_query_index_load_revert(db);
 		break;
-	case CO_DB_ABORT:
-		assert(0);
-		break;
 	default:
 		break;
 	}
