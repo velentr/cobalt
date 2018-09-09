@@ -8,23 +8,6 @@
 #include "list.h"
 #include "modules.h"
 
-static void help_usage(void)
-{
-	uprint("cobalt help [--short|-s] [<command>]\n");
-}
-
-static void help_usage_long(void)
-{
-	help_usage();
-	fprintf(stderr, "\n");
-	fprintf(stderr, "options:\n");
-	fprintf(stderr, "\t--short|-s\tprint short usage string\n");
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "arguments:\n");
-	fprintf(stderr, "\t<command>\tprint help information for <command>\n");
-}
-
 static void help_all(void)
 {
 	struct list_elem *le;
@@ -77,9 +60,9 @@ static int help_main(void)
 	}
 
 	if (shortusage.valid && shortusage.boolean.value)
-		m->usage();
+		module_usage(m);
 	else
-		m->usage_long();
+		module_usage_long(m);
 
 	return EXIT_SUCCESS;
 }
@@ -88,8 +71,6 @@ static struct module help_module = {
 	.name = "help",
 	.desc = "print usage information",
 	.main = help_main,
-	.usage = help_usage,
-	.usage_long = help_usage_long,
 	.args = { &shortusage, &command, NULL }
 };
 

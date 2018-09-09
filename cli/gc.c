@@ -13,20 +13,6 @@
 #include "modules.h"
 #include "util.h"
 
-static void gc_usage(void)
-{
-	uprint("cobalt gc [--strict]\n");
-}
-
-static void gc_usage_long(void)
-{
-	gc_usage();
-	fprintf(stderr, "\n");
-	fprintf(stderr, "options:\n");
-	fprintf(stderr, "\t--strict\n\t\treturn an error if any part of the "
-			"garbage collection fails\n");
-}
-
 static struct arg strict = {
 	.name = "strict",
 	.desc = "return an error if any part of the garbage collection fails",
@@ -69,12 +55,7 @@ static struct module gc_module = {
 	.name = "gc",
 	.desc = "run garbage collection on the database",
 	.main = gc_main,
-	.usage = gc_usage,
-	.usage_long = gc_usage_long,
-	.args = {
-		&strict,
-		NULL
-	}
+	.args = { &strict, NULL }
 };
 
 MODULE_INIT(gc_module)

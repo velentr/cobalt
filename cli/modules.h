@@ -18,8 +18,6 @@ struct module {
 	const char *name;
 	const char *desc;
 	int (*const main)(void);
-	void (*const usage)(void);
-	void (*const usage_long)(void);
 	struct arg *args[];
 };
 

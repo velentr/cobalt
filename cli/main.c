@@ -22,7 +22,7 @@ int main(int argc, const char *argv[])
 		if (mod != NULL) {
 			rc = arg_parse_all(argv + 2, mod->args);
 			if (rc != 0) {
-				mod->usage();
+				module_usage(mod);
 				return EXIT_FAILURE;
 			} else {
 				return mod->main();

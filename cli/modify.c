@@ -16,29 +16,6 @@
 #include "modules.h"
 #include "util.h"
 
-static void modify_usage(void)
-{
-	uprint("cobalt modify <id> [--delete|-d] [--edit|-e] [--no-gc|-n] "
-			"[@<board>]\n");
-}
-
-static void modify_usage_long(void)
-{
-	modify_usage();
-	fprintf(stderr, "\n");
-	fprintf(stderr, "options:\n");
-	fprintf(stderr, "\t--delete|-d\n");
-	fprintf(stderr, "\t\tdelete the specified task\n");
-	fprintf(stderr, "\t--edit|-e\n");
-	fprintf(stderr, "\t\tedit the task's data using $EDITOR\n");
-	fprintf(stderr, "\t--no-gc|-n\n");
-	fprintf(stderr, "\t\tdo not run garbage collection after deletion\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "arguments:\n");
-	fprintf(stderr, "\t<id>\tnumeric id of the task to modify\n");
-	fprintf(stderr, "\t<board>\tboard to which the task is moved\n");
-}
-
 struct arg delete;
 struct arg edit;
 struct arg nogc;
@@ -203,8 +180,6 @@ static struct module modify_module = {
 	.name = "modify",
 	.desc = "modify an existing task",
 	.main = modify_main,
-	.usage = modify_usage,
-	.usage_long = modify_usage_long,
 	.args = { &delete, &edit, &nogc, &id, &destination, NULL }
 };
 

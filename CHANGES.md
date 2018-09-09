@@ -5,6 +5,10 @@ All changes between releases will be documented in this file.
 ### Added
  - Additional manpage documentation for CLI commands.
 
+### Changed
+ - Refactored usage messages so they are automatically generated from the
+   argument sets of individual commands.
+
 ## 0.2.0 (2018/09/08)
 ### Added
  - Install and uninstall targets to Makefile.

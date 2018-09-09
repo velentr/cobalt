@@ -14,27 +14,6 @@
 #include "modules.h"
 #include "util.h"
 
-static void show_usage(void)
-{
-	uprint("cobalt show [--format|-f <format>] [--long|-l] [--no-board|-n]"
-			" [@<board>] [<id>]\n");
-}
-
-static void show_usage_long(void)
-{
-	show_usage();
-	fprintf(stderr, "\n");
-	fprintf(stderr, "options:\n");
-	fprintf(stderr, "\t--format|-f <format>\n");
-	fprintf(stderr, "\t\t\tprint output according to <format>\n");
-	fprintf(stderr, "\t--long|-l\tprint the full task data\n");
-	fprintf(stderr, "\t--no-board|-n\tdo not print the board name\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "arguments:\n");
-	fprintf(stderr, "\t<board>\t\tboard to show all tasks from\n");
-	fprintf(stderr, "\t<id>\t\tnumeric id of the board to show\n");
-}
-
 static void show_printf(const char *fmt, struct cobalt_query *task)
 {
 	enum { NORMAL, FORMAT, ESCAPE } state;
@@ -241,16 +220,7 @@ static struct module show_module = {
 	.name = "show",
 	.desc = "show information about tasks in the database",
 	.main = show_main,
-	.usage = show_usage,
-	.usage_long = show_usage_long,
-	.args = {
-		&format,
-		&lng,
-		&board,
-		&id,
-		&noboard,
-		NULL
-	}
+	.args = { &format, &lng, &board, &id, &noboard, NULL }
 };
 
 MODULE_INIT(show_module)

@@ -11,20 +11,6 @@
 #include "argparse.h"
 #include "modules.h"
 
-static void init_usage(void)
-{
-	uprint("cobalt init [<path>]\n");
-}
-
-static void init_usage_long(void)
-{
-	init_usage();
-
-	fprintf(stderr, "\n");
-	fprintf(stderr, "arguments:\n");
-	fprintf(stderr, "\t<path>\tpath to cobalt database to initialize\n");
-}
-
 struct arg path = {
 	.name = "path",
 	.desc = "path to the cobalt database to initialize",
@@ -57,9 +43,7 @@ static struct module init_module = {
 	.name = "init",
 	.desc = "initialize a cobalt task database",
 	.main = init_main,
-	.usage = init_usage,
-	.usage_long = init_usage_long,
-	.args = { NULL }
+	.args = { &path, NULL }
 };
 
 MODULE_INIT(init_module)

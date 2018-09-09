@@ -13,23 +13,6 @@
 #include "modules.h"
 #include "util.h"
 
-static void add_usage(void)
-{
-	uprint("cobalt add [--message|-m <message>] @<board>\n");
-}
-
-static void add_usage_long(void)
-{
-	add_usage();
-	fprintf(stderr, "\n");
-	fprintf(stderr, "options:\n");
-	fprintf(stderr, "\t--message|-m <message>\n");
-	fprintf(stderr, "\t\tuse <message> as the data for the new task\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "arguments:\n");
-	fprintf(stderr, "\t<board>\tboard to which the task is added\n");
-}
-
 struct arg message = {
 	.name = "message",
 	.desc = "message to use as the data for the new task",
@@ -106,8 +89,6 @@ static struct module add_module = {
 	.name = "add",
 	.desc = "add a task to the database",
 	.main = add_main,
-	.usage = add_usage,
-	.usage_long = add_usage_long,
 	.args = { &message, &board, NULL }
 };
 
