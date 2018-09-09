@@ -29,6 +29,11 @@ extern struct list commands;
 /* get the module corresponding to the given name */
 struct module *module_get(const char *name);
 
+/* print the usage string for the given module */
+void module_usage(struct module *mod);
+/* print the long-form usage message for the given module */
+void module_usage_long(struct module *mod);
+
 /* add a module to the command list on startup */
 #define MODULE_INIT(mod) \
 static void __attribute__ ((constructor)) _ ## name ## _init(void) { \
