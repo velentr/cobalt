@@ -1,0 +1,84 @@
+COBALT(7)
+=========
+:doctype: manpage
+
+NAME
+----
+cobalt - personal task database and todo tracker
+
+DESCRIPTION
+-----------
+A cobalt databse is used for storing personal tasks in a plain-text format in a
+filesystem-based database. Each task is stored on exactly one board, similar to
+a kanban board. Tasks are identified by a random 32-bit identifier and task data
+is stored in plain-text files. Tasks may also be referenced by attributes, which
+are key-value pairs associated with the task. Boards are a special case of
+attributes.
+
+All queries are specified using an index and a set of filters. The index may be
+either the task's board, one of the task's attributes, or the main object index,
+which contains all tasks.
+
+On-disk format
+~~~~~~~~~~~~~~
+The cobalt database is stored using filesystem primitives (e.g. directories,
+symlinks, etc.) to avoid reinventing complex persistent data structures and
+in-memory caches. The entire database is stored in the '.cobalt' directory. At
+the top level, there are three possible directories.
+
+'obj'::
+	All task objects are stored in this directory, along with their
+	descriptions and attribute symlinks.
+'attr'::
+	This directory contains all attribute indices (including boards).
+'gc'::
+	When a task is deleted, its on-disk object must be atomically removed.
+	Since an object is stored in a directory, the only way to do this is to
+	**rename**(1) the directory. The destination is the 'gc' directory,
+	which can then be cleaned out without worrying about atomicity.
+
+Any of one of these directories may be absent if it is not needed.
+
+Object format
+~~~~~~~~~~~~~
+Each object is identified by a 32-bit integer or, more typically, an 8-character
+hexadecimal string. All 32-bit integers are valid IDs except for 00000000.
+Inside the 'obj' directory, each object is stored in a directory that is named
+with its 8-character identifier (including leading zeroes, if needed). Inside
+the object's individual directory is the task's description and attributes.
+
+'data'::
+	Plain-text file storing the task's description.
+'attr'::
+	Directory containing the task's attributes. Inside this directory are
+	symlinks storing attribute data. Each symlink name is the key for the
+	attribute. The target of the symlink points at the attribute value
+	inside the top-level 'attr' directory.
+
+Attribute format
+~~~~~~~~~~~~~~~~
+Inside the top-level 'attr' directory is a directory for each attribute. The
+name of the directory is the name of the attribute. Inside the individual
+attribute directory, is a directory for each level of the attribute. Inside each
+level directory is a symlink for each object that has that attribute at that
+level. The symlink name is the 8-character identifier, and the target is the
+object's directory under the top-level 'obj' directory.
+
+The level directory is the target for the attribute's symlink within the
+object's directory. With this format, accessing the list of objects with a
+particular attribute and level is constant-time.
+
+SEE ALSO
+--------
+**cobalt**(1), **cobalt-modify**(1), **cobalt-show**(1)
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
