@@ -25,6 +25,11 @@
 #include "struct.h"
 #include "util.h"
 
+/* PATH_MAX isn't defined on all systems */
+#ifndef PATH_MAX
+#define PATH_MAX 128
+#endif
+
 static int co_db_dir_exist_run(struct co_db *db, const struct co_db_op *op)
 {
 	int rc;
