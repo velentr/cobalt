@@ -1,0 +1,68 @@
+CO_INIT(3)
+==========
+:doctype: manpage
+
+NAME
+----
+co_init, co_open - initialize and connect to a database
+
+SYNOPSIS
+--------
+--------------------------------------------------------------------------------
+#include <cobalt/cobalt.h>
+
+struct cobalt *co_init(const char *path, int *err);
+struct cobalt *co_open(const char *path, int *err);
+--------------------------------------------------------------------------------
+Link with '-lcobalt'.
+
+DESCRIPTION
+-----------
+The **co_init**() function creates a new empty cobalt database rooted at 'path'.
+'path' must be a valid nil-terminated string. If the database is created
+successfully, a dynamically-allocated handle to the new database is returned. If
+the database creation or a memory allocation fails, 'NULL' is returned and the
+database is not created.
+
+The **co_open**() function allocates a new handle to an existing database. If
+the dynamic allocation fails, 'NULL' is returned.
+
+If either operation fails and 'NULL' is returned, then '*err' is set to a POSIX
+'errno'. 'err' may not be a 'NULL' pointer.
+
+If the call to **co_init**() or **co_open**() succeeds, a dynamically-allocated
+handle to the database is returned. This handle may be used for interacting with
+the database through the API. When the database handle is no longer needed, it
+must be freed by calling **co_free**(3).
+
+RETURN VALUE
+------------
+**co_init**() and **co_open**() return a handle to the database on success, or
+'NULL' if an error occurred (in which case, '*err' is set appropriately).
+
+ERRORS
+------
+**co_init**() and **co_open**() can fail with the following errors:
+
+*ENOMEM*:: A heap allocation failed when opening the database handle.
+
+Additionally, **co_init**() may fail for any reason that **mkdir**(2) may fail.
+
+VERSIONS
+--------
+**co_init**() and **co_open**() were added to 'cobalt' in version 0.1 and later.
+
+SEE ALSO
+--------
+**errno**(3), **co_free**(3), **cobalt**(7)
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
