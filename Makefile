@@ -119,8 +119,8 @@ clean-test:
 clean: clean-test
 	@echo cleaning...
 	rm -f $(cliobj) $(clidep) $(clisrc) $(cli) $(lib) $(libobj) $(libdep) \
-		$(obj) $(dep) $(testobj) $(testdep) $(testbin) $(prvdoc) \
-		$(pubdoc)
+		$(obj) $(dep) $(testobj) $(testdep) $(testbin) \
+	rm -f doc/*.[1-9]
 	find -type f \( -name '*.gcda' -o -name '*.gcno' -o -name '*.gcov' \) \
 		-exec rm {} +
 
