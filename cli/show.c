@@ -11,6 +11,8 @@
 #include <cobalt/cobalt.h>
 
 #include "argparse.h"
+#include "dstring.h"
+#include "find.h"
 #include "modules.h"
 #include "util.h"
 
@@ -162,13 +164,10 @@ static int show_main(void)
 	struct cobalt_query *q;
 	const char *fmt;
 	int rc;
-	int err;
 
-	co = co_open(".", &err);
-	if (co == NULL) {
-		eprint("cannot open database: %s\n", strerror(err));
+	co = find_cobalt(NULL);
+	if (co == NULL)
 		return EXIT_FAILURE;
-	}
 
 	if (!board.valid && !id.valid && !format.valid && !lng.boolean.value) {
 		fmt = "%b\t %i  %s\n";

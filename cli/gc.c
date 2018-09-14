@@ -10,6 +10,7 @@
 #include <cobalt/cobalt.h>
 
 #include "argparse.h"
+#include "find.h"
 #include "modules.h"
 #include "util.h"
 
@@ -29,11 +30,9 @@ static int gc_main(void)
 	struct cobalt *co;
 	int rc;
 
-	co = co_open(".", &rc);
-	if (co == NULL) {
-		eprint("cannot open database: %s\n", strerror(rc));
+	co = find_cobalt(NULL);
+	if (co == NULL)
 		return EXIT_FAILURE;
-	}
 
 	if (strict.valid && strict.boolean.value)
 		rc = co_gc(co, CO_GC_STRICT);

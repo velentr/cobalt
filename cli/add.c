@@ -10,6 +10,7 @@
 
 #include "dstring.h"
 #include "editstr.h"
+#include "find.h"
 #include "modules.h"
 #include "util.h"
 
@@ -38,7 +39,6 @@ static int add_main(void)
 	const char *msg;
 	size_t len;
 	uint32_t id;
-	int err;
 	int rc;
 
 	if (!board.valid) {
@@ -46,11 +46,9 @@ static int add_main(void)
 		return EXIT_FAILURE;
 	}
 
-	co = co_open(".", &err);
-	if (co == NULL) {
-		eprint("cannot open database: %s\n", strerror(err));
+	co = find_cobalt(NULL);
+	if (co == NULL)
 		return EXIT_FAILURE;
-	}
 
 	if (!message.valid) {
 		rc = editstr_create(&data, NULL, 0);

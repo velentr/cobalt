@@ -13,6 +13,7 @@
 
 #include "argparse.h"
 #include "editstr.h"
+#include "find.h"
 #include "modules.h"
 #include "util.h"
 
@@ -147,18 +148,15 @@ static int modify_main(void)
 {
 	struct cobalt *co;
 	int rc;
-	int err;
 
 	if (!id.valid) {
 		eprint("id required to modify task\n");
 		return EXIT_FAILURE;
 	}
 
-	co = co_open(".", &err);
-	if (co == NULL) {
-		eprint("cannot open database: %s\n", strerror(err));
+	co = find_cobalt(NULL);
+	if (co == NULL)
 		return EXIT_FAILURE;
-	}
 
 	if (delete.valid && delete.boolean.value) {
 		rc = modify_do_delete(co, id.id.value);

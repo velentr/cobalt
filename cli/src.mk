@@ -3,8 +3,8 @@ dir := cli
 cli := cobalt
 
 clirl := editstr_parse
-climod := add argparse editstr gc help init main modify modules show version \
-	$(clirl)
+climod := add argparse editstr find gc help init main modify modules show \
+	version $(clirl)
 
 cliobj := $(addprefix $(dir)/,$(climod:=.o))
 clidep := $(addprefix $(dir)/,$(climod:=.d))
