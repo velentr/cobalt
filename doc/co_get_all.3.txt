@@ -1,0 +1,70 @@
+CO_GET_ALL(3)
+=============
+:doctype: manpage
+
+NAME
+----
+co_get_all, co_get_board, co_get_task - retrieve tasks from the database
+
+SYNOPSIS
+--------
+--------------------------------------------------------------------------------
+#include <cobalt/cobalt.h>
+
+int co_get_all(struct cobalt *co, struct cobalt_query **q);
+int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q);
+int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q);
+--------------------------------------------------------------------------------
+Link with '-lcobalt'.
+
+DESCRIPTION
+-----------
+The **co_get_all**(), **co_get_board**(), and **co_get_task**() functions run
+queries on the cobalt database and return information about the tasks matching
+the query. 'co' must be a valid handle on an existing database, returned from
+**co_init**(3) or **co_open**(3). 'q' must be a pointer to a cobalt query
+reference; if the query is successful, it is loaded into 'q'.
+
+**co_get_all**() returns a query that includes all tasks in the database.
+
+**co_get_board**() returns a query that includes all tasks for the given
+'board'. 'board' must be the name of an existing board in the database.
+
+**co_get_task**() returns a query that includes only the task with ID 'id'. 'id'
+must be valid 32-bit identifier for an existing task in the database.
+
+If the query succeeds, 'CO_ENOERR' is returned and '*q' points to a query
+reference. This query reference can be used for retrieving data from the
+database. The query reference will only be valid until the database is freed
+with **co_free**() or the next query reference is retrieved with
+**co_query_getnext**(3).
+
+If the query fails, a cobalt error code is returned. The value of '*q' in this
+case is undefined.
+
+RETURN VALUE
+------------
+**co_get_all**(), **co_get_board**(), and **co_get_task**() return 'CO_ENOERR'
+on success. If the query fails, another cobalt error code is returned, and the
+error code in 'co' is set. A string representation of the error may be retrieved
+with **co_strerror**(3).
+
+VERSIONS
+--------
+**co_get_all**(), **co_get_board**(), and **co_get_task**() were added to
+'cobalt' in version 0.1 and later.
+
+SEE ALSO
+--------
+**errno**(3), **co_query_getnext**(3), **cobalt**(7)
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
