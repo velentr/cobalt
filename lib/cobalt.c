@@ -25,6 +25,26 @@
 
 #define CO_SID_LEN sizeof("XXXXXXXX/")
 
+int co_exists(const char *_path)
+{
+	struct dstring path;
+	struct stat st;
+	int rc;
+
+	rc = dstrcpy(&path, _path);
+	if (rc != 0)
+		return 0;
+	rc = dstrcat(&path, "/.cobalt");
+	if (rc != 0)
+		return 0;
+
+	rc = stat(dstr(&path), &st);
+	if (rc == 0 && S_ISDIR(st.st_mode))
+		return 1;
+	else
+		return 0;
+}
+
 void co_version(int *major, int *minor, int *patch)
 {
 	if (major != NULL)

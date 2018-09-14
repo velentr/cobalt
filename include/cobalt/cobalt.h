@@ -35,6 +35,9 @@ CO_API void co_version(int *major, int *minor, int *patch);
 /* get error string from the last cobalt operation */
 CO_API const char *co_strerror(struct cobalt *co);
 
+/* check if the given path contains a cobalt database */
+CO_API int co_exists(const char *path);
+
 /* initialize a cobalt task list in the given directory */
 CO_API struct cobalt *co_init(const char *path, int *err);
 
