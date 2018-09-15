@@ -8,6 +8,8 @@ All changes between releases will be documented in this file.
 ### Changed
  - Refactored usage messages so they are automatically generated from the
    argument sets of individual commands.
+ - In CLI, search parent directories for a cobalt database to open. Start the
+   search in `COBALT_PATH` if it is set.
 
 ## 0.2.0 (2018/09/08)
 ### Added

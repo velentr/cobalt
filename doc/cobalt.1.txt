@@ -20,6 +20,13 @@ Boards act as an index into the task database, so all tasks on a particular
 board can be accessed quickly. Each task is represented by a plain-text data
 file that can be edited by the user.
 
+For the tasks that operate on the database, a database is found by first
+searching the current working directory for a cobalt database. If none is found,
+the parent directories of the current directory are search sequentially until a
+database is found or there are no more parents. If the *COBALT_PATH* environment
+variable is set, then the search will start at the path specified in
+*${COBALT_PATH}* instead of the current working directory.
+
 To get started, read the command section below; to view the options for a
 particular command, run 'cobalt help <command>'.
 
@@ -54,6 +61,12 @@ COMMANDS
 
 *version*::
 	Print version information about the 'cobalt' installation.
+
+ENVIRONMENT VARIABLES
+---------------------
+The starting path to search for the cobalt database is taken from the
+*COBALT_PATH* environment variable. If no such variable is provided, then the
+current working directory is used instead.
 
 AUTHOR
 ------
