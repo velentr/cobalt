@@ -1,0 +1,64 @@
+#compdef cobalt
+
+_cobalt_boards=(${(ps:\n:)"$(cobalt show -f "%b\n" 2>/dev/null | sort | uniq)"})
+_cobalt_tasks=(${(ps:\n:)"$(cobalt show -f "%i\\\\:'%s'\n" 2>/dev/null)"})
+
+_cobalt_commands=(
+	"add\:'add a task to the database'"
+	"gc\:'run garbage collection on the database'"
+	"help\:'print usage information'"
+	"init\:'initialize a cobalt task database'"
+	"modify\:'modify an existing task'"
+	"show\:'show information about tasks in the database'"
+	"version\:'print version information about the cobalt installation'"
+)
+
+_cobalt_add_args=(
+	'(-m --message)'{-m,--message}'[message to use as the data for the new task]:string'
+	"*:cobalt_select:(($_cobalt_boards))"
+)
+
+_cobalt_gc_args=(
+	'(-s --strict)'{-s,--strict}'[return an error if any part of the garbage collection fails]'
+)
+
+_cobalt_help_args=(
+	'(-s --short)'{-s,--short}'[print shortened usage message]'
+	"2:cobalt_help_arg:(($_cobalt_commands))"
+)
+
+_cobalt_init_args=(
+	"*:cobalt_init_path:_files"
+)
+
+_cobalt_modify_args=(
+	'(-d --delete -e --edit)'{-d,--delete}'[delete the specified task]'
+	'(-d --delete -e --edit -n --no-gc)'{-e,--edit}"[edit the task's data using \$EDITOR]"
+	'(-n --no-gc)'{-n,--no-gc}'[do not run garbage collection after deletion]'
+	"*:mod_board:(($_cobalt_tasks $_cobalt_boards))"
+)
+
+_cobalt_show_args=(
+	'(-f --format -l --long)'{-f,--format}'[string used to specify output formatting]:string'
+	'(-l --long -f --format)'{-l,--long}'[print the full task data]'
+	'(-n --no-board)'{-n,--no-board}'[do not print the board name]'
+	"*:cobalt_select:(($_cobalt_boards $_cobalt_tasks))"
+)
+
+_cobalt_version_args=(
+	'(-l --library)'{-l,--library}'[print version of the linked library rather than the app]'
+)
+
+case $words[2] in
+	add)		_cobalt_args=($_cobalt_add_args)	;;
+	gc)		_cobalt_args=($_cobalt_gc_args)		;;
+	help)		_cobalt_args=($_cobalt_help_args)	;;
+	init)		_cobalt_args=($_cobalt_init_args)	;;
+	modify)		_cobalt_args=($_cobalt_modify_args)	;;
+	show)		_cobalt_args=($_cobalt_show_args)	;;
+	version)	_cobalt_args=($_cobalt_version_args)	;;
+	*)		_cobalt_args=()				;;
+esac
+
+_arguments "1:cobalt_command:(($_cobalt_commands))" \
+	$_cobalt_args

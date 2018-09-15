@@ -4,6 +4,7 @@ All changes between releases will be documented in this file.
 ## Unreleased
 ### Added
  - Additional manpage documentation for CLI commands and API functions.
+ - Shell completion for zsh.
 
 ### Changed
  - Refactored usage messages so they are automatically generated from the
