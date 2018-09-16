@@ -11,6 +11,10 @@ All changes between releases will be documented in this file.
  - In CLI, search parent directories for a cobalt database to open. Start the
    search in `COBALT_PATH` if it is set.
 
+### Fixed
+ - Correctly return an error in the CLI if strict garbage collection is
+   specified and the GC fails.
+
 ## 0.2.0 (2018/09/08)
 ### Added
  - Install and uninstall targets to Makefile.

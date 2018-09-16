@@ -47,7 +47,7 @@ static int gc_main(void)
 	}
 
 	co_free(co);
-	return EXIT_SUCCESS;
+	return rc;
 }
 
 static struct module gc_module = {
