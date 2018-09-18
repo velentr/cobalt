@@ -122,9 +122,11 @@ struct cobalt *co_open(const char *path, int *err)
 
 void co_free(struct cobalt *co)
 {
-	co_db_free(&co->db);
-	dstrclr(&co->path);
-	free(co);
+	if (co != NULL) {
+		co_db_free(&co->db);
+		dstrclr(&co->path);
+		free(co);
+	}
 }
 
 static int co_do_add(struct cobalt *co, const char *sid, const char *data,

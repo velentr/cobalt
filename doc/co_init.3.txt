@@ -4,7 +4,7 @@ CO_INIT(3)
 
 NAME
 ----
-co_init, co_open - initialize and connect to a database
+co_init, co_open, co_free - initialize and free cobalt database handles
 
 SYNOPSIS
 --------
@@ -13,6 +13,7 @@ SYNOPSIS
 
 struct cobalt *co_init(const char *path, int *err);
 struct cobalt *co_open(const char *path, int *err);
+void co_free(struct cobalt *co);
 --------------------------------------------------------------------------------
 Link with '-lcobalt'.
 
@@ -33,7 +34,12 @@ If either operation fails and 'NULL' is returned, then '*err' is set to a POSIX
 If the call to **co_init**() or **co_open**() succeeds, a dynamically-allocated
 handle to the database is returned. This handle may be used for interacting with
 the database through the API. When the database handle is no longer needed, it
-must be freed by calling **co_free**(3).
+must be freed by calling **co_free**().
+
+The **co_free**() function frees all memory used by the database handle 'co',
+which must have been returned from a previous call to **co_init**() or
+**co_open**(). Calling **co_free**() more than once on the same handle is
+undefined. If 'co' is 'NULL', this function is a no-op.
 
 RETURN VALUE
 ------------
@@ -50,11 +56,12 @@ Additionally, **co_init**() may fail for any reason that **mkdir**(2) may fail.
 
 VERSIONS
 --------
-**co_init**() and **co_open**() were added to 'cobalt' in version 0.1 and later.
+**co_init**(), **co_open**(), and **co_free**() were added to 'cobalt' in
+version 0.1 and later.
 
 SEE ALSO
 --------
-**errno**(3), **co_free**(3), **cobalt**(7)
+**errno**(3), **cobalt**(7)
 
 AUTHOR
 ------
