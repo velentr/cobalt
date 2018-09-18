@@ -1,0 +1,84 @@
+CO_ADD(3)
+=========
+:doctype: manpage
+
+NAME
+----
+co_add, co_delete, co_gc - add and delete tasks from a cobalt database
+
+SYNOPSIS
+--------
+--------------------------------------------------------------------------------
+#include <stdint.h>
+#include <cobalt/cobalt.h>
+
+uint32_t co_add(struct cobalt *co, const char *data, size_t len, const char
+	*board);
+int co_delete(struct cobalt *co, uint32_t id, uint32_t flags);
+int co_gc(struct cobalt *co, uint32_t flags);
+--------------------------------------------------------------------------------
+Link with '-lcobalt'.
+
+DESCRIPTION
+-----------
+The **co_add**() function adds a new task to the cobalt database 'co'. The
+task's data will be set to 'data' (which is 'len' bytes long), and the new task
+will be placed on 'board'. The task's unique 32-bit identifier is returned.
+
+The **co_delete**() function deletes task 'id' from the database 'co'.
+Additional parameters are set with the 'flags' bitmask. The different flags that
+may be OR'd together are:
+
+*CO_DEL_NGC*::
+	Do not run garbage collection after deleting the task. If this is set,
+	then the task's on-disk data will not be cleaned up until **co_gc**() is
+	called, or until the next call to **co_delete**() that does not have
+	this flag set.
+*CO_DEL_STRICTGC*::
+	If garbage collection is run after deleting the task (i.e. *CO_DEL_NGC*
+	is not set), pass the *CO_GC_STRICT* flag to the garbage collection
+	pass. Normally, garbage collection will not cause **co_delete**() to
+	fail; use this flag to ensure that the on-disk data is cleaned up.
+
+In order to keep certain operations atomic, the cobalt database moves deleted
+tasks to a garbage heap rather than deleting them. This heap must be regularly
+cleaned up to free the disk space used by the deleted task. By default,
+**co_delete**() will run this garbage collection pass after the task is removed
+from the database.
+
+The garbage collection on 'co' may be run manually with the **co_gc**()
+function. The following may be OR'd into 'flags' to change the behavior of
+**co_gc**():
+
+*CO_GC_STRICT*::
+	Ensure that any errors in the garbage collection propagate to the
+	caller. By default, only some errors will be reported. With this flag
+	set, if any file deletion during the garbage collection fails, then the
+	call will return an error.
+
+RETURN VALUE
+------------
+**co_add**() returns the 32-bit numeric identifier of the newly-created task. If
+it fails to create the new task, 0 is returned (0 is not a valid task ID).
+**co_delete**() and **co_gc**() return 'CO_ENOERR' on success, or a different
+error code on failure.
+
+VERSIONS
+--------
+**co_add**(), **co_delete**(), and **co_gc**() were added to 'cobalt' in version
+0.1 and later.
+
+SEE ALSO
+--------
+**errno**(3), **co_strerror**(3), **cobalt**(7)
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
