@@ -1,0 +1,54 @@
+CO_VERSION(3)
+=============
+:doctype: manpage
+
+NAME
+----
+co_version - get version information
+
+SYNOPSIS
+--------
+--------------------------------------------------------------------------------
+#include <cobalt/cobalt.h>
+
+#define CO_MAJOR ...
+#define CO_MINOR ...
+#define CO_PATCH ...
+
+void co_version(int *major, int *minor, int *patch);
+--------------------------------------------------------------------------------
+Link with '-lcobalt'.
+
+DESCRIPTION
+-----------
+The **co_version**() function is used for retrieving the version of the dynamic
+library. The major version number is stored in 'major', the minor version number
+is stored in 'minor', and the patch version is stored in 'patch'. If any of
+these parameters is 'NULL', then that parameter will not be set (e.g. you may
+retrieve only the patch version by setting 'major' and 'minor' to 'NULL').
+
+Additionally, the *CO_MAJOR*, *CO_MINOR*, and *CO_PATCH* macros are defined in
+the header file to the major, minor, and patch versions, respectively. These
+macros may be used for determining the version of the headers being compiled
+against. A program may use these and compare them to the values returned by
+**co_version**() to detect if the linked library is older or newer than the
+application.
+
+VERSIONS
+--------
+**co_version**() was added to 'cobalt' in version 0.1 and later.
+
+SEE ALSO
+--------
+**cobalt**(7)
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
