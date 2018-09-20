@@ -13,6 +13,7 @@ SYNOPSIS
 
 struct cobalt *co_init(const char *path, int *err);
 struct cobalt *co_open(const char *path, int *err);
+int co_exists(const char *path);
 void co_free(struct cobalt *co);
 --------------------------------------------------------------------------------
 Link with '-lcobalt'.
@@ -36,6 +37,12 @@ handle to the database is returned. This handle may be used for interacting with
 the database through the API. When the database handle is no longer needed, it
 must be freed by calling **co_free**().
 
+The **co_open**() function may still succeed even if a cobalt database does not
+exist at the given directory. In order to verify that a cobalt database exists,
+use **co_exists**(). If **co_exists**() returns true, then a cobalt database
+exists at 'path'. If **co_exists**() returns false, then no database exists at
+the given 'path'.
+
 The **co_free**() function frees all memory used by the database handle 'co',
 which must have been returned from a previous call to **co_init**() or
 **co_open**(). Calling **co_free**() more than once on the same handle is
@@ -45,6 +52,9 @@ RETURN VALUE
 ------------
 **co_init**() and **co_open**() return a handle to the database on success, or
 'NULL' if an error occurred (in which case, '*err' is set appropriately).
+
+**co_exists**() returns true if and only if a cobalt database exists at the
+given directory.
 
 ERRORS
 ------
@@ -57,7 +67,7 @@ Additionally, **co_init**() may fail for any reason that **mkdir**(2) may fail.
 VERSIONS
 --------
 **co_init**(), **co_open**(), and **co_free**() were added to 'cobalt' in
-version 0.1 and later.
+version 0.1 and later. **co_exists**() was added to 'cobalt' in version 0.3.
 
 SEE ALSO
 --------
