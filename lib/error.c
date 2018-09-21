@@ -29,6 +29,9 @@ static const char *co_strerror_priv(int errnum)
 	case CO_ECORRUPT:
 		ret = "Database corruption detected";
 		break;
+	case CO_ELIMIT:
+		ret = "Internal memory limitation reached";
+		break;
 	default:
 		ret = "Unknown error";
 		break;
