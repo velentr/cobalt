@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include <cobalt/cobalt.h>
 #include <cobalt/cobalt_error.h>
 
 #include "struct.h"
