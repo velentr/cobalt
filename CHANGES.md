@@ -11,6 +11,7 @@ All changes between releases will be documented in this file.
    argument sets of individual commands.
  - In CLI, search parent directories for a cobalt database to open. Start the
    search in `COBALT_PATH` if it is set.
+ - Refactored database storage into the File System Virtual Machine (FSVM).
 
 ### Fixed
  - Correctly return an error in the CLI if strict garbage collection is
