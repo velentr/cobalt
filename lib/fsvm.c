@@ -441,7 +441,7 @@ static int fsvm_run_map(struct fsvm *vm, uint8_t reg, uint8_t name)
 	struct fsvm_glob *g;
 	char *map;
 	int fd;
-	int rc;
+	int rc = CO_ENOERR;
 
 	assert(vm != NULL);
 	assert(reg < FSVM_GLOB_NUM_REGS);
@@ -572,6 +572,13 @@ static int fsvm_run_one(struct fsvm *vm, const struct fsvm_op *op)
 		break;
 	case FSVM_NOP:
 		rc = 0;
+		break;
+	default:
+		/* need to set rc here to avoid some compiler warnings; this
+		 * should be indicative of a bug, so assert as well
+		 */
+		rc = EINVAL;
+		assert(0);
 		break;
 	}
 
