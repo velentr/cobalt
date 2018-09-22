@@ -10,8 +10,9 @@ extern int __malloc_fail;
 
 int main()
 {
-	struct dstring uut = DSTR_EMPTY;
+	struct dstring uut;
 
+	dstrempty(&uut);
 	__malloc_fail = 1;
 	assert(dstrcat(&uut, TEST_STRING) == ENOMEM);
 	__malloc_fail = 0;

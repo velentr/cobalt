@@ -32,28 +32,18 @@ struct dstring {
 	};
 };
 
-/* initialize a static dstring */
-#define DSTR_INIT(s) { \
-	.type = DSTR_STACK, \
-	.used = sizeof(s), \
-	.stack = s, \
-}
-
-/* initialize a static empty dstring */
-#define DSTR_EMPTY DSTR_INIT("")
-
 /* create an empty dstring */
 void dstrempty(struct dstring *str);
+
+/* copy the value of a dynamic string */
+#define dstrcpy(dst, src) dstrcpyl(dst, src, strlen(src))
+int dstrcpyl(struct dstring *dst, const char *src, size_t len);
 
 /* get the string length (not including the nil byte) */
 size_t dstrlen(const struct dstring *str);
 
 /* get the buffer for a given string */
 const char *dstr(struct dstring *str);
-
-/* copy the value of a dynamic string */
-#define dstrcpy(dst, src) dstrcpyl(dst, src, strlen(src))
-int dstrcpyl(struct dstring *dst, const char *src, size_t len);
 
 /* concatenate one string onto the end of another */
 #define dstrcat(dst, src) dstrcatl(dst, src, strlen(src))

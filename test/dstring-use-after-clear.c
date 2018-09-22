@@ -8,8 +8,9 @@
 
 int main()
 {
-	struct dstring uut = DSTR_INIT(TEST_INIT);
+	struct dstring uut;
 
+	assert(dstrcpy(&uut, TEST_INIT) == 0);
 	dstrclr(&uut);
 	assert(dstrcpy(&uut, TEST_END) == 0);
 	assert(strcmp(dstr(&uut), TEST_END) == 0);

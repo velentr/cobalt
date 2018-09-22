@@ -106,11 +106,13 @@ static int modify_do_move(struct cobalt *co, uint32_t id, const char *board)
 
 static int modify_do_edit(struct cobalt *co, uint32_t id)
 {
-	struct dstring data = DSTR_EMPTY;
+	struct dstring data;
 	struct cobalt_query *q;
 	const char *cur_data;
 	size_t cur_len;
 	int rc;
+
+	dstrempty(&data);
 
 	rc = co_get_task(co, id, &q);
 	if (rc != CO_ENOERR) {

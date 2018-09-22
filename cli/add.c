@@ -34,12 +34,14 @@ struct arg board = {
 
 static int add_main(void)
 {
-	struct dstring data = DSTR_EMPTY;
+	struct dstring data;
 	struct cobalt *co;
 	const char *msg;
 	size_t len;
 	uint32_t id;
 	int rc;
+
+	dstrempty(&data);
 
 	if (!board.valid) {
 		eprint("board required when adding task\n");

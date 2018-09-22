@@ -45,8 +45,10 @@ static int co_gc_fn(const char *path, const struct stat *st, int type,
 
 int co_gc(struct cobalt *co, uint32_t flags)
 {
-	struct dstring root = DSTR_EMPTY;
+	struct dstring root;
 	int rc;
+
+	dstrempty(&root);
 
 	rc = dstrcatl(&root, dstr(&co->path), dstrlen(&co->path));
 	if (rc != CO_ENOERR)
