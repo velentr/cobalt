@@ -40,7 +40,7 @@ include $(sub:=/src.mk)
 include src.mk
 
 testobj := $(test:=.o) $(testlib:=.o)
-testdep := $(test:=.d)
+testdep := $(test:=.d) $(testlib:=.d)
 testbin := $(test:=.test)
 testres := $(test:=.result)
 
