@@ -1,7 +1,7 @@
 # Changelog
 All changes between releases will be documented in this file.
 
-## Unreleased
+## 0.3.0 (2018/09/22)
 ### Added
  - Additional manpage documentation for CLI commands and API functions.
  - Shell completion for zsh.
