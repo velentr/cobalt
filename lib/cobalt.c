@@ -575,7 +575,8 @@ int co_get_all(struct cobalt *co, struct cobalt_query **q)
 	return rc;
 }
 
-struct cobalt_query *co_query_getnext(struct cobalt *co, struct cobalt_query *q)
+struct cobalt_query *co_query_getnext(struct cobalt *co,
+		UNUSED struct cobalt_query *q)
 {
 	struct fsvm_glob *g;
 	struct list_elem *first;
