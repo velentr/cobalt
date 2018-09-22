@@ -28,6 +28,25 @@
 #define CO_MAP_REG	0
 #define CO_BOARD_REG	1
 
+/* validate that 'attr' is valid for an attribute name or value */
+static int co_validate_attr(const char *attr)
+{
+	const char *p;
+	size_t len;
+
+	for (p = attr, len = 0;; p++) {
+		switch (*p) {
+		case '\0':
+			return len == 0 ? EINVAL : CO_ENOERR;
+		case '/':
+			return EINVAL;
+		default:
+			len++;
+			continue;
+		}
+	}
+}
+
 int co_exists(const char *_path)
 {
 	struct dstring path;
@@ -211,6 +230,13 @@ uint32_t co_add(struct cobalt *co, const char *data, size_t len,
 	uint32_t id;
 	int rc;
 
+	/* make sure the passed in board name is valid */
+	rc = co_validate_attr(board);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return 0;
+	}
+
 	id = co_getrandomid(&co->rng, &co->err);
 	if (id == 0)
 		return 0;
@@ -259,6 +285,12 @@ int co_mod_data(struct cobalt *co, uint32_t id, const char *data, size_t len)
 {
 	char sid[CO_ID_STRLEN + 2];
 	int rc;
+
+	/* check for an invalid id */
+	if (id == 0) {
+		co->err = EINVAL;
+		return EINVAL;
+	}
 
 	snprintf(sid, lengthof(sid), "%08x/", id);
 
@@ -334,6 +366,22 @@ int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
 	char sid[CO_ID_STRLEN + 2];
 	int rc;
 
+	/* validate user input */
+	rc = co_validate_attr(name);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+	rc = co_validate_attr(newval);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+	if (id == 0) {
+		co->err = EINVAL;
+		return EINVAL;
+	}
+
 	snprintf(sid, lengthof(sid), "%08x/", id);
 
 	rc = co_do_mod_attr(co, sid, name, newval);
@@ -364,6 +412,11 @@ int co_delete(struct cobalt *co, uint32_t id, uint32_t flags)
 	char sid[CO_ID_STRLEN + 2];
 	int rc;
 	uint32_t gcflags;
+
+	if (id == 0) {
+		co->err = EINVAL;
+		return EINVAL;
+	}
 
 	snprintf(sid, lengthof(sid), "%08x/", id);
 
@@ -421,6 +474,11 @@ int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q)
 	char sid[CO_ID_STRLEN + 1];
 	int rc;
 
+	if (id == 0) {
+		co->err = EINVAL;
+		return EINVAL;
+	}
+
 	rc = snprintf(sid, lengthof(sid), "%08x", id);
 	assert(rc == CO_ID_STRLEN);
 
@@ -458,6 +516,12 @@ int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q)
 		OP_RDLNK(CO_BOARD_REG, 3),
 	};
 	int rc;
+
+	rc = co_validate_attr(board);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
 
 	fsvm_init(&vm);
 	fsvm_ldarg(&vm, 0, dstr(&co->path), dstrlen(&co->path));
