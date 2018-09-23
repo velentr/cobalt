@@ -146,7 +146,7 @@ int dstrgrow(struct dstring *str, size_t space)
 		return dstrgrowh(str, space);
 }
 
-const char *dstr(struct dstring *str)
+const char *dstr(const struct dstring *str)
 {
 	if (dstrstatic(str))
 		return str->stack;
@@ -255,16 +255,16 @@ int dstrcatl(struct dstring *dst, const char *src, size_t len)
 		return dstrcathl(dst, src, len);
 }
 
-void dstrclr(struct dstring *dst)
+void dstrclr(struct dstring *str)
 {
-	if (dstrdynamic(dst)) {
-		DSTR_HEAP_UNLOCK(dst);
-		free(dst->heap.p);
+	if (dstrdynamic(str)) {
+		DSTR_HEAP_UNLOCK(str);
+		free(str->heap.p);
 	} else {
-		DSTR_STACK_UNLOCK(dst);
+		DSTR_STACK_UNLOCK(str);
 	}
 
-	dstrempty(dst);
+	dstrempty(str);
 }
 
 void dstrdel(struct dstring *str, size_t len)

@@ -43,7 +43,7 @@ int dstrcpyl(struct dstring *dst, const char *src, size_t len);
 size_t dstrlen(const struct dstring *str);
 
 /* get the buffer for a given string */
-const char *dstr(struct dstring *str);
+const char *dstr(const struct dstring *str);
 
 /* concatenate one string onto the end of another */
 #define dstrcat(dst, src) dstrcatl(dst, src, strlen(src))
@@ -53,7 +53,7 @@ int dstrcatl(struct dstring *dst, const char *src, size_t len);
 int dstrgrow(struct dstring *str, size_t space);
 
 /* clear a dynamic string (freeing all used memory) */
-void dstrclr(struct dstring *dst);
+void dstrclr(struct dstring *str);
 
 /* delete len characters from the end of a string */
 void dstrdel(struct dstring *str, size_t len);

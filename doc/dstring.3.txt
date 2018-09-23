@@ -1,0 +1,94 @@
+DSTRING(3)
+==========
+:doctype: manpage
+
+NAME
+----
+dstring - dynamically-sized strings
+
+DESCRIPTION
+-----------
+
+The 'dstring' data structure is used for holding dynamically-sized strings. The
+library interface is designed to ensure that the resulting string will always be
+nil-terminated and there is always enough memory allocated for the data.
+
+Initial memory for the string is embedded within the 'dstring' structure itself.
+Once the string grows beyond the structure bounds, it is copied to a malloc'd
+buffer and is stored on the heap. The cutoff for the amount of data stored
+inside the structure is 'DSTR_STACK_SIZE'; note that this includes the nil byte,
+so the string length is one less.
+
+When the stack space runs out, a heap buffer is allocated. The heap buffer will
+be sized as the smallest power of two large enough to hold the string's data. If
+the string outgrows its bounds, the buffer will be grow using **realloc**(3) to
+hold the new data.
+
+There are two ways to initialize the 'dstring': with **dstrempty**() and with
+**dstrcpyl**(). The macro **dstrcpy**() may be used as well. Once the string is
+done, use **dstrclr**() to free any memory.
+
+Most of the API functions have two versions: a function with the *l* suffix, and
+a macro without. The function with the *l* suffix takes a length parameter,
+while the macro without the suffix automatically populates the 'len' argument
+with **strlen**(3).
+
+TYPES
+-----
+*struct dstring*::
+	A dynamically-sized string. Special care is taken to ensure that the
+	string will always be nil-terminated and there will always be enough
+	space to hold the data.
+
+API REFERENCE
+-------------
+*void dstrempty(struct dstring *str)*::
+	Initialize a new empty dynamic string. 'str' should be a newly-allocated
+	string that has not yet been used.
+
+*int dstrcpyl(struct dstring *dst, const char *src, size_t len)*::
+	Initialize the new dynamic string 'str' with data, using 'len' bytes
+	from 'src'. Note that there should be no nil byte within the first 'len'
+	bytes of 'src'. 'str' should be a newly-allocated string that has not
+	yet been used. If the copy succeeds, the function returns '0'. If the
+	function fails, it returns a valid 'errno' value. If 'len' is less than
+	'DSTR_STACK_SIZE', then this function will not fail.
+
+*const char *dstr(const char *str)*::
+	Retrieve a pointer to the given 'str'. This is guaranteed to be a
+	nil-terminated string.
+
+*size_t dstrlen(const char *str)*::
+	Retrieve the number of characters in 'str' (not including the nil byte).
+	This function runs in O(1) time, since the length is stored in the
+	structure.
+
+*int dstrcatl(struct dstring *dst, const char *src, size_t len)*::
+	Concatenates 'len' bytes from 'src' onto the end of 'dst'. There should
+	be no nil byte in the first 'len' bytes of 'src'. If the concatenation
+	is successful, returns '0'. If the function fails, returns a valid
+	'errno' value describing the error.
+
+*int dstrgrow(struct dstring *str, size_t space)*::
+	Grow 'str' so that it can store 'space' additional bytes. If the
+	operation succeeds, return '0'. If the operation fails, a valid 'errno'
+	value is returned describing the error. If this function succeeds, then
+	subsequent calls to **dstrcatl**() will be guaranteed up to the next
+	'space' bytes. This may be useful for batching concatenations.
+
+*void dstrdel(struct dstring *str, size_t len)*::
+	Delete 'len' characters from the end of 'str'. The buffer backing the
+	dynamic string is not shrunk, so this will not free any memory. If the
+	string has fewer than 'len' characters, then the result is undefined.
+
+*void dstrclr(struct dstring *str)*::
+	Clear all memory used by 'str'. All memory in use by the string will be
+	freed and the string will be cleared to a valid empty state. The string
+	may be used again after calling this function.
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:
