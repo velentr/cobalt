@@ -34,6 +34,9 @@ static int co_validate_attr(const char *attr)
 	const char *p;
 	size_t len;
 
+	if (*attr == '.')
+		return EINVAL;
+
 	for (p = attr, len = 0;; p++) {
 		switch (*p) {
 		case '\0':
