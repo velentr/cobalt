@@ -1,9 +1,10 @@
 # Changelog
 All changes between releases will be documented in this file.
 
-## Unreleased
+## 0.3.1 (2018/09/24)
 ### Fixed
  - Properly set return value when mapping an empty query.
+ - Additional checks eliminate hidden file names for attributes.
 
 ## 0.3.0 (2018/09/22)
 ### Added
