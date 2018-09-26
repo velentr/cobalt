@@ -15,12 +15,16 @@
 #include "util.h"
 
 int __malloc_fail = 0;
+int __malloc_fail_count = 0;
 extern void *__real_malloc(size_t size);
 void *__wrap_malloc(size_t size)
 {
-	if (__malloc_fail) {
+	if (__malloc_fail && __malloc_fail_count == 0) {
 		errno = __malloc_fail;
 		return NULL;
+	} else if (__malloc_fail) {
+		__malloc_fail_count--;
+		return __real_malloc(size);
 	} else {
 		return __real_malloc(size);
 	}

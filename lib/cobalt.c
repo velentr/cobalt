@@ -134,14 +134,14 @@ struct cobalt *co_open(const char *path, int *err)
 	co_rng_init(&co->rng);
 
 	rc = dstrcpy(&co->path, path);
-	if (rc == -1) {
+	if (rc != 0) {
 		free(co);
 		*err = rc;
 		return NULL;
 	}
 
 	rc = dstrcat(&co->path, "/.cobalt");
-	if (rc == -1) {
+	if (rc != 0) {
 		dstrclr(&co->path);
 		free(co);
 		*err = rc;
