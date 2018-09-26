@@ -5,6 +5,8 @@ All changes between releases will be documented in this file.
 ### Fixed
  - Corrected return value in dstring allocation failures to use `errno` instead
    of defaulting to `ENOMEM`.
+ - Incorrect cleanup of `NULL` cobalt pointer; `co_free(NULL)` should be a
+   no-op.
 
 ## 0.3.1 (2018/09/24)
 ### Fixed

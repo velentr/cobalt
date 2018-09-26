@@ -157,12 +157,12 @@ void co_free(struct cobalt *co)
 {
 	struct fsvm_glob *g;
 
-	while (!list_isempty(&co->globs)) {
-		g = to_fsvm_glob(list_popfront(&co->globs));
-		fsvm_globfree(g);
-	}
-
 	if (co != NULL) {
+		while (!list_isempty(&co->globs)) {
+			g = to_fsvm_glob(list_popfront(&co->globs));
+			fsvm_globfree(g);
+		}
+
 		dstrclr(&co->path);
 		free(co);
 	}
