@@ -14,6 +14,7 @@ There are no runtime dependencies (besides a C library).
 ### Build-time
  - ragel FSM compiler
  - GCC-compatible C compiler
+ - glibc (2.25 or newer)
  - GNU make (version 4.2 or newer)
  - Perl 5 (for running tests)
  - Asciidoc (for building documentation)
