@@ -127,7 +127,7 @@ struct cobalt *co_open(const char *path, int *err)
 
 	co = malloc(sizeof(*co));
 	if (co == NULL) {
-		*err = ENOMEM;
+		*err = errno;
 		return NULL;
 	}
 
@@ -136,7 +136,7 @@ struct cobalt *co_open(const char *path, int *err)
 	rc = dstrcpy(&co->path, path);
 	if (rc == -1) {
 		free(co);
-		*err = ENOMEM;
+		*err = rc;
 		return NULL;
 	}
 
@@ -144,7 +144,7 @@ struct cobalt *co_open(const char *path, int *err)
 	if (rc == -1) {
 		dstrclr(&co->path);
 		free(co);
-		*err = ENOMEM;
+		*err = rc;
 		return NULL;
 	}
 

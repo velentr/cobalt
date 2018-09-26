@@ -5,6 +5,7 @@ All changes between releases will be documented in this file.
 ### Fixed
  - Corrected return value in dstring allocation failures to use `errno` instead
    of defaulting to `ENOMEM`.
+ - Corrected return value from `co_open()` during memory allocation failures.
  - Incorrect cleanup of `NULL` cobalt pointer; `co_free(NULL)` should be a
    no-op.
 
