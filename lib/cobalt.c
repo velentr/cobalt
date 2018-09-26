@@ -328,7 +328,7 @@ static int co_do_mod_attr(struct cobalt *co, const char *sid, const char *name,
 		OP_ACAT(1, 5),
 
 		OP_ACAT(2, 8),
-		OP_ACAT(2, 2),
+		OP_ACAT(2, 5),
 		OP_ACAT(3, 9),
 
 		OP_ACAT(5, 10),

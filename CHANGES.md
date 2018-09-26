@@ -9,6 +9,7 @@ All changes between releases will be documented in this file.
  - Incorrect cleanup of `NULL` cobalt pointer; `co_free(NULL)` should be a
    no-op.
  - Generate man page for `co_exists()`.
+ - Create correct symlink when modifying an attribute.
 
 ## 0.3.1 (2018/09/24)
 ### Fixed
