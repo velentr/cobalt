@@ -13,8 +13,8 @@ int main()
 	struct dstring uut;
 
 	dstrempty(&uut);
-	__malloc_fail = 1;
-	assert(dstrcat(&uut, TEST_STRING) == ENOMEM);
+	__malloc_fail = EIO;
+	assert(dstrcat(&uut, TEST_STRING) == EIO);
 	__malloc_fail = 0;
 	dstrclr(&uut);
 

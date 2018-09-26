@@ -14,8 +14,8 @@ int main()
 	struct dstring uut;
 
 	assert(dstrcpy(&uut, TEST_PREFIX) == 0);
-	__realloc_fail = 1;
-	assert(dstrcat(&uut, TEST_SUFFIX) == ENOMEM);
+	__realloc_fail = EIO;
+	assert(dstrcat(&uut, TEST_SUFFIX) == EIO);
 	__realloc_fail = 0;
 	assert(strcmp(dstr(&uut), TEST_PREFIX) == 0);
 	dstrclr(&uut);

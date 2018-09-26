@@ -1,6 +1,11 @@
 # Changelog
 All changes between releases will be documented in this file.
 
+## Unreleased
+### Fixed
+ - Corrected return value in dstring allocation failures to use `errno` instead
+   of defaulting to `ENOMEM`.
+
 ## 0.3.1 (2018/09/24)
 ### Fixed
  - Properly set return value when mapping an empty query.

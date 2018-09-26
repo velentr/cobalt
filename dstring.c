@@ -83,7 +83,7 @@ static int dstrconv(struct dstring *dst, const char *src, size_t len,
 
 	buf = malloc(alloc * sizeof(*src));
 	if (buf == NULL)
-		return ENOMEM;
+		return errno;
 
 	memcpy(buf, src, len);
 
@@ -127,7 +127,7 @@ static int dstrgrowh(struct dstring *str, size_t space)
 		assert(newlen >= str->used + space);
 		buf = realloc(str->heap.p, newlen);
 		if (buf == NULL)
-			return ENOMEM;
+			return errno;
 
 		str->heap.p = buf;
 		str->heap.allocd = newlen;

@@ -12,8 +12,8 @@ int main()
 {
 	struct dstring uut;
 
-	__malloc_fail = 1;
-	assert(dstrcpy(&uut, TEST_STRING) == ENOMEM);
+	__malloc_fail = EIO;
+	assert(dstrcpy(&uut, TEST_STRING) == EIO);
 	__malloc_fail = 0;
 
 	return 0;
