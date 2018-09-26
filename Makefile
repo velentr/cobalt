@@ -34,7 +34,7 @@ cover :=
 pubdoc :=
 prvdoc :=
 
-sub := cli doc lib test
+sub := cli doc lib lib/test test
 
 include $(sub:=/src.mk)
 include src.mk
