@@ -8,6 +8,7 @@ All changes between releases will be documented in this file.
  - Corrected return value from `co_open()` during memory allocation failures.
  - Incorrect cleanup of `NULL` cobalt pointer; `co_free(NULL)` should be a
    no-op.
+ - Generate man page for `co_exists()`.
 
 ## 0.3.1 (2018/09/24)
 ### Fixed

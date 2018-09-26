@@ -4,7 +4,8 @@ CO_INIT(3)
 
 NAME
 ----
-co_init, co_open, co_free - initialize and free cobalt database handles
+co_init, co_open, co_exists, co_free - initialize and free cobalt database
+handles
 
 SYNOPSIS
 --------
