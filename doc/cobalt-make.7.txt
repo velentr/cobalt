@@ -1,0 +1,126 @@
+COBALT-MAKE(7)
+==============
+:doctype: manpage
+
+NAME
+----
+cobalt-make - build system for cobalt
+
+DESCRIPTION
+-----------
+The cobalt build system is based on GNU make. The build process is typically
+started by calling 'make all', and the files can be installed with 'sudo make
+install'. The exact behavior of the build process is controlled by various
+environment variables.
+
+TARGETS
+-------
+*all*::
+	Builds the CLI binary, the shared library, and the public documentation.
+
+*install*::
+	Installs the binary, shared library, and public header files to
+	'$DESTDIR' under '$prefix'.
+
+*uninstall*::
+	Uninstalls the binary, shared library, and public header files. The
+	'$DESTDIR' and '$prefix' variables must be set to the same value as
+	during the install in order to correctly remove the installed files.
+
+*test*::
+	Build and run any out-of-date tests.
+
+*retest*::
+	Re-runs all tests, including tests that have already passed. This is
+	useful for re-running tests under valgrind after the initial tests pass.
+
+*doc*::
+	Build all public and private documentation.
+
+*clean*::
+	Clean up all generated files.
+
+ENVIRONMENT VARIABLES
+---------------------
+*CC*::
+	Sets the compiler to use for building cobalt. If none is provided,
+	defaults to 'gcc'.
+
+*CFLAGS*::
+	Additional flags to pass to the compiler during the compilation stage.
+	These flags (if used) should contain optimization flags, architecture
+	specification, and (optionally) debug flags. The '-DNDEBUG' flag may be
+	added here if assertions are not needed.
+
+*DFLAGS*::
+	Additional flags for generating dependency information during the build.
+	This should be set properly by the Makefile and is not likely to be
+	useful.
+
+*LDFLAGS*::
+	Additional flags to pass to the linker during the link stage. Note that
+	'CC' is used for the linking step as well, so the flags should match the
+	compiler, not the linker (e.g. 'gcc' flags, not 'ld' flags).
+
+*RL*::
+	Sets the 'ragel' finite state machine generator to use during
+	compilation. If none is provided, defaults to 'ragel'.
+
+*RLFLAGS*::
+	Additional flags to pass to the 'ragel' compiler during the compile
+	phase. By default, no optimization flags are added; if any optimization
+	is needed, add flags here.
+
+*A2X*::
+	Sets the path to the asciidoc 'a2x' toolchain to use for generating
+	documentation. If none is provided, defaults to 'a2x'.
+
+*DOCFLAGS*::
+	Additional flags to pass to 'a2x' during the documentation generation.
+
+*INSTALL*::
+	Path to the 'install' binary to use during the installation phase. If
+	none is provided, defaults to 'install'.
+
+*prefix*::
+	Installation prefix used for configuring where cobalt will be installed.
+	If none is provided, defaults to '/usr/local'.
+
+*DESTDIR*::
+	Installation destination, in case installation to root is not desired.
+	Defaults to empty.
+
+*libdir*::
+	Directory under which shared and static libraries will be installed.
+	Defaults to '${DESTDIR}${prefix}/lib'.
+
+*bindir*::
+	Directory under which binaries will be installed. Defaults to
+	'${DESTDIR}${prefix}/bin'.
+
+*includedir*::
+	Directory under which header files will be installed. Defaults to
+	'${DESTDIR}${prefix}/include/cobalt'.
+
+*VALGRIND*::
+	Enable valgrind during testing. This will slow down the tests
+	significantly, but will catch more errors.
+
+*V*::
+	Enable verbose build mode. In this mode, every command will be printed
+	to 'stdout' before it is run.
+
+SEE ALSO
+--------
+**cobalt**(7)
+
+AUTHOR
+------
+Cobalt is written by Brian Kubisiak <brian@kubisiak.com>
+
+COPYING
+-------
+Copyright (C) 2018 Brian Kubisiak <brian@kubisiak.com>. Free use of this
+software is granted under the terms of the MIT license.
+
+// vim: set ft=asciidoc:

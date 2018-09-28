@@ -8,7 +8,7 @@ cobalt - personal task database and todo tracker
 
 DESCRIPTION
 -----------
-A cobalt databse is used for storing personal tasks in a plain-text format in a
+A cobalt database is used for storing personal tasks in a plain-text format in a
 filesystem-based database. Each task is stored on exactly one board, similar to
 a kanban board. Tasks are identified by a random 32-bit identifier and task data
 is stored in plain-text files. Tasks may also be referenced by attributes, which

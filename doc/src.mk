@@ -9,6 +9,7 @@ pubdoc += $(dir)/co_get_all.3
 pubdoc += $(dir)/co_version.3
 pubdoc += $(dir)/cobalt.7
 
+prvdoc += $(dir)/cobalt-make.7
 prvdoc += $(dir)/dstring.3
 prvdoc += $(dir)/list.3
 

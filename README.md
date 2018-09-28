@@ -48,6 +48,8 @@ $ make DESTDIR=/tmp prefix=/usr install
 Note that `DESTDIR` defaults to the empty string, and `prefix` defaults to
 `/usr/local`.
 
+More documentation on the build process is found in `doc/cobalt-make.7`.
+
 ## Usage
 
 Initialize a database:
