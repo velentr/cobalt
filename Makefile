@@ -1,8 +1,3 @@
-version := $(shell ./script/get-version.pl include/cobalt/cobalt.h)
-ifneq ($(.SHELLSTATUS),0)
-$(error cannot read cobalt version)
-endif
-
 CC ?= gcc
 CFLAGS += -fpic -Wall -Wextra -std=gnu99 -Iinclude -I. -Ilib -fvisibility=hidden
 DFLAGS += -MMD
@@ -13,7 +8,7 @@ RL ?= ragel
 RLFLAGS += -C
 
 A2X ?= a2x
-DOCFLAGS += -f manpage -d manpage -L -a 'manversion=Cobalt $(version)'
+DOCFLAGS += -f manpage -d manpage -L
 
 GCOV ?= gcov
 
@@ -48,7 +43,7 @@ testres := $(test:=.result)
 $(foreach R,$(cgen),$(eval CFLAGS_$R := -w))
 
 all: $(cli) $(lib) $(pubdoc)
-	@echo finished building cobalt $(version)
+	@echo finished building cobalt
 
 install: $(cli) $(lib)
 	$(INSTALL_DIR) $(bindir) $(libdir) $(includedir)
