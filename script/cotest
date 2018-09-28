@@ -1,0 +1,72 @@
+#!/bin/bash
+
+valgrind="valgrind --error-exitcode=2 --leak-check=full
+	--errors-for-leak-kinds=all --quiet"
+
+# Execute a command, optionally under valgrind. If the command fails, exit and
+# print out the error.
+dorun() {
+	if [ -z $V ]; then
+		res=`$@`
+	else
+		res=`${valgrind} $@`
+	fi
+
+	rc=$?
+	if [ $rc != 0 ]; then
+		echo "$res"
+		exit $rc
+	else
+		echo PASS > $output
+	fi
+}
+
+# Set up and enter the test fixture
+setup_fixture() {
+	rm -rf ${F}
+	mkdir -p ${F}
+	pushd ${F} >/dev/null
+}
+
+# Exit and tear down the test fixture
+teardown_fixture() {
+	popd >/dev/null
+	rm -rf ${F}
+}
+
+usage() {
+	echo "usage: $0 [-f <fixture>] [-l <library>] [-r] [-v] <cotest>" 1>&2
+}
+
+L=''
+F='.cotest'
+O='.cotest/stdout'
+R=''
+V=''
+while getopts 'f:l:o:rv' opt; do
+	case $opt in
+	l)	L="$OPTARG"
+		;;
+	f)	F="$OPTARG"
+		;;
+	o)	O="$OPTARG"
+		;;
+	r)	R=1
+		;;
+	v)	V=1
+		;;
+	*)	usage
+		;;
+	esac
+done
+shift $(($OPTIND - 1))
+
+cotest="$PWD/$1"
+output="$PWD/$O"
+
+if [ ! -z $R ]; then
+	setup_fixture
+	dorun $cotest
+	teardown_fixture
+fi
+

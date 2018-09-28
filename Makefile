@@ -61,7 +61,7 @@ uninstall:
 
 # turn on valgrind only when specified
 ifdef VALGRIND
-vlgnd := --valgrind
+vlgnd := -v
 endif
 
 test: $(testres)
@@ -109,9 +109,9 @@ $(lib): $(libobj) $(obj)
 	@echo "LD	$*"
 	$(CC) $^ -o $@ $(LDFLAGS_test) $(LDFLAGS)
 
-%.result: %.test ./script/run-test.pl
+%.result: %.test script/cotest
 	@echo "TEST	$*"
-	./script/run-test.pl $< -o $@ $(vlgnd)
+	script/cotest -f .fixture/$* -r $(vlgnd) -o $@ $<
 
 clean-test:
 	rm -f $(testres)
