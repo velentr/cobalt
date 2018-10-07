@@ -24,6 +24,8 @@
 /* macro to make this attribute a little shorter */
 #define UNUSED	__attribute__((unused))
 
+/* pointer to a function for comparing two items */
+typedef int (*cmp_func)(const void *, const void *);
 
 #endif /* end of include guard: UTIL_H_ */
 
