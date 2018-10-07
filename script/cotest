@@ -34,6 +34,12 @@ teardown_fixture() {
 	rm -rf ${F}
 }
 
+# Automatically fail the test if the run_test function is not overloaded
+run_test() {
+	echo 'no test procedure defined!' 1>&2
+	exit 1
+}
+
 usage() {
 	echo "usage: $0 [-f <fixture>] [-l <library>] [-r] [-v] <cotest>" 1>&2
 }
@@ -67,6 +73,11 @@ output="$PWD/$O"
 if [ ! -z $R ]; then
 	setup_fixture
 	dorun $cotest
+	teardown_fixture
+else
+	source $cotest
+	setup_fixture
+	run_test
 	teardown_fixture
 fi
 
