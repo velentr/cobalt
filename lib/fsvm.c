@@ -296,7 +296,12 @@ static void fsvm_revert_dlnk(struct fsvm *vm, uint8_t targ, uint8_t name)
 	target = dstr(&vm->reg[targ]);
 	linkname = dstr(&vm->reg[name]);
 
-	(void)symlink(target, linkname);
+	/* symlink is declared with attribute warn_unused_result, but there is
+	 * nothing we can do to handle an error here, since we are already
+	 * trying to recover from an error; just ignore the error (and the GCC
+	 * warning and move on
+	 */
+	ignore(symlink(target, linkname));
 }
 
 static int fsvm_run_rcat(struct fsvm *vm, uint8_t dst, uint8_t src)

@@ -24,6 +24,7 @@ static void editstr_init(struct editstr *es)
 	es->fd = -1;
 }
 
+/* XXX move open/fstat/mmap to common code */
 static int editstr_map(const char *fname, struct editstr *es)
 {
 	struct stat st;

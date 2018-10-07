@@ -27,5 +27,8 @@
 /* pointer to a function for comparing two items */
 typedef int (*cmp_func)(const void *, const void *);
 
+/* ignore the return value from a function with attribute warn_unused_result */
+static UNUSED void ignore(UNUSED int r) { }
+
 #endif /* end of include guard: UTIL_H_ */
 

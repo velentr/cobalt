@@ -2,6 +2,10 @@
 All changes between releases will be documented in this file.
 
 ## Unreleased
+### Added
+ - Add configuration file support, along with a command for checking the
+   configuration parsing.
+
 ### Changed
  - Eliminated dependency on Perl for build and tests.
 
