@@ -5,6 +5,7 @@ _cobalt_tasks=(${(ps:\n:)"$(cobalt show -f "%i\\\\:'%s'\n" 2>/dev/null)"})
 
 _cobalt_commands=(
 	"add\:'add a task to the database'"
+	"config\:'check configuration file syntax'"
 	"gc\:'run garbage collection on the database'"
 	"help\:'print usage information'"
 	"init\:'initialize a cobalt task database'"
@@ -16,6 +17,10 @@ _cobalt_commands=(
 _cobalt_add_args=(
 	'(-m --message)'{-m,--message}'[message to use as the data for the new task]:string'
 	"*:cobalt_select:(($_cobalt_boards))"
+)
+
+_cobalt_config_args=(
+	"*:cobalt_init_path:_files"
 )
 
 _cobalt_gc_args=(
