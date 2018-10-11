@@ -2,26 +2,34 @@
 
 valgrind="valgrind --error-exitcode=2 --leak-check=full --errors-for-leak-kinds=all --quiet"
 
-docobalt() {
-	dorun $cobalt $@
+# Run a single command, under valgrind if necesary, with the correct LD_PRELOAD
+run_command() {
+	if [ -z $V ]; then
+		env LD_PRELOAD=${lib} $@ 2>&1
+	else
+		env LD_PRELOAD=${lib} ${valgrind} $@ 2>&1
+	fi
 }
 
 # Execute a command, optionally under valgrind. If the command fails, exit and
 # print out the error.
 dorun() {
-	if [ -z $V ]; then
-		res=`LD_PRELOAD=$lib $@ 2>&1`
-	else
-		res=`LD_PRELOAD=$lib ${valgrind} $@ 2>&1`
-	fi
+	cmd="$@"
+	res=`run_command $@`
 	rc=$?
 
 	if [ $rc != 0 ]; then
+		echo "Running '${cmd}' failed:"
 		echo "$res"
 		exit $rc
 	else
 		echo PASS > $output
 	fi
+}
+
+# Run a cobalt command, using an absolute path to the cobalt binary
+docobalt() {
+	dorun $cobalt $@
 }
 
 # Set up and enter the test fixture
