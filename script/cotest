@@ -10,9 +10,9 @@ docobalt() {
 # print out the error.
 dorun() {
 	if [ -z $V ]; then
-		res=`LD_PRELOAD=$lib $@`
+		res=`LD_PRELOAD=$lib $@ 2>&1`
 	else
-		res=`LD_PRELOAD=$lib ${valgrind} $@`
+		res=`LD_PRELOAD=$lib ${valgrind} $@ 2>&1`
 	fi
 	rc=$?
 
