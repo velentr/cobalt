@@ -1,0 +1,4 @@
+run_test() {
+	touch .cobalt
+	dofcobalt init
+}

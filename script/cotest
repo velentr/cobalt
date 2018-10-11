@@ -27,9 +27,30 @@ dorun() {
 	fi
 }
 
+# Execute a command, exit and print an error if the command succeeds
+dofail() {
+	cmd="$@"
+	res=`run_command $@`
+	rc=$?
+
+	if [ $rc == 0 ]; then
+		echo "Running '${cmd}' succeeded (erroneously)"
+		exit 1
+	elif [ $rc == 2 ]; then
+		echo "Memory error detected for '${cmd}':"
+		echo "$res"
+		exit $rc
+	fi
+}
+
 # Run a cobalt command, using an absolute path to the cobalt binary
 docobalt() {
 	dorun $cobalt $@
+}
+
+# Run a cobalt command, expecting it to fail
+dofcobalt() {
+	dofail $cobalt $@
 }
 
 # Set up and enter the test fixture
