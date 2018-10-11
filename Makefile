@@ -25,11 +25,12 @@ includedir ?= $(DESTDIR)$(prefix)/include/cobalt
 # directories
 cgen :=
 test :=
+cotest :=
 cover :=
 pubdoc :=
 prvdoc :=
 
-sub := cli doc lib lib/test test
+sub := cli cli/test doc lib lib/test test
 
 include $(sub:=/src.mk)
 include src.mk
@@ -38,6 +39,7 @@ testobj := $(test:=.o) $(testlib:=.o)
 testdep := $(test:=.d) $(testlib:=.d)
 testbin := $(test:=.test)
 testres := $(test:=.result)
+cotestres := $(cotest:.cotest=.coresult)
 
 # turn off warnings for generated C files
 $(foreach R,$(cgen),$(eval CFLAGS_$R := -w))
@@ -59,7 +61,7 @@ ifdef VALGRIND
 vlgnd := -v
 endif
 
-test: $(testres)
+test: $(testres) $(cotestres)
 	@echo all tests passed
 
 retest: clean-test test
@@ -108,8 +110,12 @@ $(lib): $(libobj) $(obj)
 	@echo "TEST	$*"
 	script/cotest -f .fixture/$* -r $(vlgnd) -o $@ $<
 
+%.coresult: %.cotest script/cotest $(cli) $(lib)
+	@echo "TEST	$*"
+	script/cotest -f .fixture/$* $(vlgnd) -o $@ $<
+
 clean-test:
-	rm -f $(testres)
+	rm -f $(testres) $(cotestres)
 
 clean: clean-test
 	@echo cleaning...
