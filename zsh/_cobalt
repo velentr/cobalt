@@ -56,6 +56,7 @@ _cobalt_version_args=(
 
 case $words[2] in
 	add)		_cobalt_args=($_cobalt_add_args)	;;
+	config)		_cobalt_args=($_cobalt_config_args)	;;
 	gc)		_cobalt_args=($_cobalt_gc_args)		;;
 	help)		_cobalt_args=($_cobalt_help_args)	;;
 	init)		_cobalt_args=($_cobalt_init_args)	;;
