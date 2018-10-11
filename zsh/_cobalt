@@ -20,7 +20,7 @@ _cobalt_add_args=(
 )
 
 _cobalt_config_args=(
-	"*:cobalt_init_path:_files"
+	"*:cobalt_config_path:_files"
 )
 
 _cobalt_gc_args=(
