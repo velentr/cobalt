@@ -1,18 +1,21 @@
 #!/bin/bash
 
-valgrind="valgrind --error-exitcode=2 --leak-check=full
-	--errors-for-leak-kinds=all --quiet"
+valgrind="valgrind --error-exitcode=2 --leak-check=full --errors-for-leak-kinds=all --quiet"
+
+docobalt() {
+	dorun $cobalt $@
+}
 
 # Execute a command, optionally under valgrind. If the command fails, exit and
 # print out the error.
 dorun() {
 	if [ -z $V ]; then
-		res=`$@`
+		res=`LD_PRELOAD=$lib $@`
 	else
-		res=`${valgrind} $@`
+		res=`LD_PRELOAD=$lib ${valgrind} $@`
 	fi
-
 	rc=$?
+
 	if [ $rc != 0 ]; then
 		echo "$res"
 		exit $rc
@@ -44,7 +47,7 @@ usage() {
 	echo "usage: $0 [-f <fixture>] [-l <library>] [-r] [-v] <cotest>" 1>&2
 }
 
-L=''
+L='libcobalt.so'
 F='.cotest'
 O='.cotest/stdout'
 R=''
@@ -69,6 +72,8 @@ shift $(($OPTIND - 1))
 
 cotest="$PWD/$1"
 output="$PWD/$O"
+lib="$PWD/$L"
+cobalt="$PWD/cobalt"
 
 if [ ! -z $R ]; then
 	setup_fixture
