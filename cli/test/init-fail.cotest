@@ -1,4 +1,7 @@
-run_test() {
+setup() {
 	touch .cobalt
+}
+
+run_test() {
 	dofcobalt init
 }

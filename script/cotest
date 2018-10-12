@@ -53,15 +53,27 @@ dofcobalt() {
 	dofail $cobalt $@
 }
 
+# Setup and teardown functions that may be overridden by the cotest script
+setup() {
+	return 0
+}
+teardown() {
+	return 0
+}
+
 # Set up and enter the test fixture
 setup_fixture() {
 	rm -rf ${F}
 	mkdir -p ${F}
 	pushd ${F} >/dev/null
+
+	setup
 }
 
 # Exit and tear down the test fixture
 teardown_fixture() {
+	teardown
+
 	popd >/dev/null
 	rm -rf ${F}
 }
