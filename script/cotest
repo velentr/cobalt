@@ -1,13 +1,18 @@
 #!/bin/bash
 
-valgrind="valgrind --error-exitcode=2 --leak-check=full --errors-for-leak-kinds=all --quiet"
-
 # Run a single command, under valgrind if necesary, with the correct LD_PRELOAD
 run_command() {
 	if [ -z $V ]; then
 		env LD_PRELOAD=${lib} $@ 2>&1
 	else
-		env LD_PRELOAD=${lib} ${valgrind} $@ 2>&1
+		env LD_PRELOAD=${lib} \
+			valgrind \
+			--error-exitcode=2 \
+			--leak-check=full \
+			--show-leak-kinds=all \
+			--errors-for-leak-kinds=all \
+			--quiet \
+			$@ 2>&1
 	fi
 }
 
