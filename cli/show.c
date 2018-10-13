@@ -11,20 +11,97 @@
 #include <cobalt/cobalt.h>
 
 #include "argparse.h"
+#include "config.h"
 #include "dstring.h"
 #include "find.h"
 #include "modules.h"
 #include "util.h"
 
+static const char *show_board_color = "";
+static const char *show_id_color = "";
+static const char *show_short_color = "";
+static const char *show_long_color = "";
+static const char *show_reset_color = "";
+
+static const char *show_colorof(const char *color)
+{
+	if (strcmp(color, "black") == 0)
+		return "\033[30m";
+	else if (strcmp(color, "red") == 0)
+		return "\033[31m";
+	else if (strcmp(color, "green") == 0)
+		return "\033[32m";
+	else if (strcmp(color, "yellow") == 0)
+		return "\033[33m";
+	else if (strcmp(color, "blue") == 0)
+		return "\033[34m";
+	else if (strcmp(color, "magenta") == 0)
+		return "\033[35m";
+	else if (strcmp(color, "cyan") == 0)
+		return "\033[36m";
+	else if (strcmp(color, "white") == 0)
+		return "\033[37m";
+	else
+		return "\033[0m";
+}
+
+static void show_setup_colors(void)
+{
+	int en;
+
+	en = conf_getb("color", "enable", 0);
+	if (en) {
+		show_board_color =
+			show_colorof(conf_gets("color", "board", "red"));
+		show_id_color =
+			show_colorof(conf_gets("color", "id", "yellow"));
+		show_short_color =
+			show_colorof(conf_gets("color", "short", "reset"));
+		show_long_color =
+			show_colorof(conf_gets("color", "long", "reset"));
+		show_reset_color = show_colorof("reset");
+	}
+}
+
+static void show_printboard(const char *board)
+{
+	printf("%s@%s%s", show_board_color, board, show_reset_color);
+}
+
+static void show_printid(uint32_t id)
+{
+	printf("%s%08x%s", show_id_color, id, show_reset_color);
+}
+
+static void show_printshort(const char *data, size_t len)
+{
+	const char *end;
+
+	fputs(show_short_color, stdout);
+	end = memchr(data, '\n', len);
+	if (end == NULL)
+		fwrite(data, 1, len, stdout);
+	else
+		fwrite(data, 1, end - data, stdout);
+	fputs(show_reset_color, stdout);
+}
+
+static void show_printlong(const char *data, size_t len)
+{
+	fputs(show_long_color, stdout);
+	fwrite(data, 1, len, stdout);
+	fputs(show_reset_color, stdout);
+}
+
 static void show_printf(const char *fmt, struct cobalt_query *task)
 {
 	enum { NORMAL, FORMAT, ESCAPE } state;
 	const char *data;
-	const char *end;
 	const char *board = NULL;
 	size_t len;
 
 	co_query_getdata(task, &data, &len);
+	board = co_query_getboard(task);
 	for (state = NORMAL; *fmt != '\0'; fmt++) {
 		switch (state) {
 		case NORMAL:
@@ -43,22 +120,16 @@ static void show_printf(const char *fmt, struct cobalt_query *task)
 		case FORMAT:
 			switch (*fmt) {
 			case 'b':
-				if (board == NULL)
-					board = co_query_getboard(task);
-				printf("@%s", board);
+				show_printboard(board);
 				break;
 			case 'i':
-				printf("%08x", co_query_getid(task));
+				show_printid(co_query_getid(task));
 				break;
 			case 'l':
-				fwrite(data, 1, len, stdout);
+				show_printlong(data, len);
 				break;
 			case 's':
-				end = memchr(data, '\n', len);
-				if (end == NULL)
-					fwrite(data, 1, len, stdout);
-				else
-					fwrite(data, 1, end - data, stdout);
+				show_printshort(data, len);
 				break;
 			default:
 				putchar('%');
@@ -169,6 +240,8 @@ static int show_main(void)
 	if (co == NULL)
 		return EXIT_FAILURE;
 
+	show_setup_colors();
+
 	if (!board.valid && !id.valid && !format.valid && !lng.boolean.value) {
 		fmt = "%b\t %i  %s\n";
 		rc = co_get_all(co, &q);
@@ -201,8 +274,10 @@ static int show_main(void)
 	if (rc == CO_ENOERR) {
 		rc = EXIT_SUCCESS;
 
-		if (board.valid && !noboard.boolean.value)
-			printf("@%s\n", board.board.value);
+		if (board.valid && !noboard.boolean.value) {
+			show_printboard(board.board.value);
+			putchar('\n');
+		}
 
 		for (; q != NULL; q = co_query_getnext(co, q))
 			show_printf(fmt, q);
