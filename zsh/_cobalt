@@ -1,7 +1,7 @@
 #compdef cobalt
 
-_cobalt_boards=(${(ps:\n:)"$(cobalt show -f "%b\n" 2>/dev/null | sort | uniq)"})
-_cobalt_tasks=(${(ps:\n:)"$(cobalt show -f "%i\\\\:'%s'\n" 2>/dev/null)"})
+_cobalt_boards=(${(ps:\n:)"$(cobalt show -c -f "%b\n" 2>/dev/null | sort | uniq)"})
+_cobalt_tasks=(${(ps:\n:)"$(cobalt show -c -f "%i\\\\:'%s'\n" 2>/dev/null)"})
 
 _cobalt_commands=(
 	"add\:'add a task to the database'"

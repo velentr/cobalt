@@ -23,6 +23,83 @@ static const char *show_short_color = "";
 static const char *show_long_color = "";
 static const char *show_reset_color = "";
 
+static struct arg lng;
+static struct arg format = {
+	.name = "format",
+	.desc = "string used to specify output formatting",
+	.type = ARG_STRING,
+	.string = {
+		.lmatch = "format",
+		.smatch = 'f',
+	},
+	.exclude = {
+		&lng,
+		NULL
+	}
+};
+static struct arg lng = {
+	.name = "long",
+	.desc = "print the full task data",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "long",
+		.smatch = 'l',
+		.value = 0,
+	},
+	.exclude = {
+		&format,
+		NULL
+	}
+};
+
+static struct arg board;
+static struct arg noboard;
+static struct arg id = {
+	.name = "id",
+	.desc = "numeric id of the board to show",
+	.type = ARG_ID,
+	.exclude = {
+		&board,
+		&noboard,
+		NULL
+	}
+};
+static struct arg board = {
+	.name = "board",
+	.desc = "board to show all tasks from",
+	.type = ARG_BOARD,
+	.exclude = {
+		&id,
+		NULL
+	}
+};
+static struct arg noboard = {
+	.name = "no-board",
+	.desc = "do not print the board name",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "no-board",
+		.smatch = 'n',
+		.value = 0,
+	},
+	.exclude = {
+		&id,
+		NULL
+	}
+};
+
+static struct arg nocolor = {
+	.name = "no-color",
+	.desc = "do not output colors, even if enabled in the config",
+	.type = ARG_BOOL,
+	.boolean = {
+		.lmatch = "no-color",
+		.smatch = 'c',
+		.value = 0,
+	},
+	.exclude = { NULL }
+};
+
 static const char *show_colorof(const char *color)
 {
 	if (strcmp(color, "black") == 0)
@@ -49,7 +126,7 @@ static void show_setup_colors(void)
 {
 	int en;
 
-	en = conf_getb("color", "enable", 0);
+	en = !nocolor.boolean.value && conf_getb("color", "enable", 0);
 	if (en) {
 		show_board_color =
 			show_colorof(conf_gets("color", "board", "red"));
@@ -164,71 +241,6 @@ static void show_printf(const char *fmt, struct cobalt_query *task)
 	}
 }
 
-static struct arg lng;
-static struct arg format = {
-	.name = "format",
-	.desc = "string used to specify output formatting",
-	.type = ARG_STRING,
-	.string = {
-		.lmatch = "format",
-		.smatch = 'f',
-	},
-	.exclude = {
-		&lng,
-		NULL
-	}
-};
-static struct arg lng = {
-	.name = "long",
-	.desc = "print the full task data",
-	.type = ARG_BOOL,
-	.boolean = {
-		.lmatch = "long",
-		.smatch = 'l',
-		.value = 0,
-	},
-	.exclude = {
-		&format,
-		NULL
-	}
-};
-
-static struct arg board;
-static struct arg noboard;
-static struct arg id = {
-	.name = "id",
-	.desc = "numeric id of the board to show",
-	.type = ARG_ID,
-	.exclude = {
-		&board,
-		&noboard,
-		NULL
-	}
-};
-static struct arg board = {
-	.name = "board",
-	.desc = "board to show all tasks from",
-	.type = ARG_BOARD,
-	.exclude = {
-		&id,
-		NULL
-	}
-};
-static struct arg noboard = {
-	.name = "no-board",
-	.desc = "do not print the board name",
-	.type = ARG_BOOL,
-	.boolean = {
-		.lmatch = "no-board",
-		.smatch = 'n',
-		.value = 0,
-	},
-	.exclude = {
-		&id,
-		NULL
-	}
-};
-
 static int show_main(void)
 {
 	struct cobalt *co;
@@ -294,7 +306,7 @@ static struct module show_module = {
 	.name = "show",
 	.desc = "show information about tasks in the database",
 	.main = show_main,
-	.args = { &format, &lng, &board, &id, &noboard, NULL }
+	.args = { &format, &lng, &board, &id, &noboard, &nocolor, NULL }
 };
 
 MODULE_INIT(show_module)

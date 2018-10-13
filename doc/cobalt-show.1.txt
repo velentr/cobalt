@@ -71,6 +71,10 @@ OPTIONS
 	Do not print the board name before printing task data. This only affects
 	behavior when '@<board>' is specified for querying tasks.
 
+-c, --no-color::
+	Do not use terminal colors, even if explicitly enabled in the config
+	file.
+
 AUTHOR
 ------
 Cobalt is written by Brian Kubisiak <brian@kubisiak.com>

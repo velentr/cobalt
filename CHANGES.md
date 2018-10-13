@@ -5,6 +5,8 @@ All changes between releases will be documented in this file.
 ### Added
  - Add configuration file support, along with a command for checking the
    configuration parsing.
+ - Output terminal color codes for the show command, when enabled in the config
+   file.
 
 ### Changed
  - Eliminated dependency on Perl for build and tests.
