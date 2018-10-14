@@ -93,6 +93,19 @@ static void conf_setup(struct conf_entry *ent, const char *section, size_t slen,
 	ent->key = s;
 }
 
+static void conf_add(struct conf_entry *ent)
+{
+	struct conf_entry *cur;
+
+	cur = (struct conf_entry *)ht_get(&config, &ent->he);
+	if (cur != NULL) {
+		ht_remove(&cur->he);
+		free(cur);
+	}
+
+	ht_insert(&config, &ent->he);
+}
+
 int conf_adds(const char *section, size_t slen, const char *key, size_t klen,
 		const char *value, size_t vlen)
 {
@@ -112,7 +125,7 @@ int conf_adds(const char *section, size_t slen, const char *key, size_t klen,
 	ent->s = s;
 	ent->type = CONF_STRING;
 
-	ht_insert(&config, &ent->he);
+	conf_add(ent);
 
 	return 0;
 }
@@ -132,7 +145,7 @@ int conf_addl(const char *section, size_t slen, const char *key, size_t klen,
 	ent->l = value;
 	ent->type = CONF_LONG;
 
-	ht_insert(&config, &ent->he);
+	conf_add(ent);
 
 	return 0;
 }
@@ -152,7 +165,7 @@ int conf_addb(const char *section, size_t slen, const char *key, size_t klen,
 	ent->b = value;
 	ent->type = CONF_BOOL;
 
-	ht_insert(&config, &ent->he);
+	conf_add(ent);
 
 	return 0;
 }
