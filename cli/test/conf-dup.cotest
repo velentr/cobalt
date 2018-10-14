@@ -1,0 +1,9 @@
+setup() {
+	echo '[test]' >> .cobaltconfig
+	echo 'val = true' >> .cobaltconfig
+	echo 'val = false' >> .cobaltconfig
+}
+
+run_test() {
+	docobalt init
+}
