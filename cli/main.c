@@ -14,15 +14,13 @@
 #include "modules.h"
 #include "util.h"
 
-static int parseall(void)
+#define CONF_DOTFILE	".cobaltconfig"
+
+static int parsehome(void)
 {
 	struct dstring conf;
 	const char *homedir;
 	int rc;
-
-	rc = conf_init();
-	if (rc != 0)
-		return rc;
 
 	homedir = getenv("HOME");
 	if (homedir == NULL)
@@ -32,7 +30,7 @@ static int parseall(void)
 	if (rc != 0)
 		return rc;
 
-	rc = dstrcat(&conf, "/.cobaltconfig");
+	rc = dstrcat(&conf, "/" CONF_DOTFILE);
 	if (rc != 0) {
 		dstrclr(&conf);
 		return rc;
@@ -42,6 +40,25 @@ static int parseall(void)
 	dstrclr(&conf);
 
 	return rc;
+}
+
+static int parsecwd(void)
+{
+	return conf_parse(CONF_DOTFILE);
+}
+
+static int parseall(void)
+{
+	int rc;
+
+	rc = conf_init();
+	if (rc != 0)
+		return rc;
+
+	parsehome();
+	parsecwd();
+
+	return 0;
 }
 
 int main(int argc, const char *argv[])
