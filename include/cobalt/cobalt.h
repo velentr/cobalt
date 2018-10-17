@@ -76,6 +76,10 @@ CO_API int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q);
 CO_API int co_get_board(struct cobalt *co, const char *board,
 		struct cobalt_query **q);
 
+/* get all tasks with the given attribute */
+CO_API int co_get_attr(struct cobalt *co, const char *attr, const char *value,
+		struct cobalt_query **q);
+
 /* get all tasks from the database */
 CO_API int co_get_all(struct cobalt *co, struct cobalt_query **q);
 

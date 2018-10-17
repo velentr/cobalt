@@ -592,21 +592,35 @@ int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q)
 
 int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q)
 {
+	return co_get_attr(co, "board", board, q);
+}
+
+int co_get_attr(struct cobalt *co, const char *attr, const char *value,
+		struct cobalt_query **q)
+{
 	struct fsvm vm;
 	struct fsvm_op get_board[] = {
-		OP_ACAT(0, 0),
-		OP_ACAT(0, 1),
-		OP_ACAT(0, 4),
-		OP_ACAT(2, 2),
-		OP_ACAT(3, 3),
-		OP_LD(0),
+		OP_ACAT(0, 0),	/* r0 <- ".cobalt" */
+		OP_ACAT(0, 1),	/* r0 <- ".cobalt/attr/" */
+		OP_ACAT(0, 5),	/* r0 <- ".cobalt/attr/<attr>" */
+		OP_ACAT(0, 6),	/* r0 <- ".cobalt/attr/<attr>/" */
+		OP_ACAT(0, 4),	/* r0 <- ".cobalt/attr/<attr>/<value>" */
+		OP_ACAT(2, 2),	/* r2 <- "data" */
+		OP_ACAT(3, 3),	/* r3 <- "attr/board" */
+		OP_LD(0),	/* foreach .cobalt/attr/<attr>/<value>: */
 		OP_GLOB,
-		OP_MAP(CO_MAP_REG, 2),
-		OP_RDLNK(CO_BOARD_REG, 3),
+		OP_MAP(CO_MAP_REG, 2),		/* map "data" */
+		OP_RDLNK(CO_BOARD_REG, 3),	/* readlink "attr/board" */
 	};
 	int rc;
 
-	rc = co_validate_attr(board);
+	rc = co_validate_attr(attr);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+
+	rc = co_validate_attr(value);
 	if (rc != CO_ENOERR) {
 		co->err = rc;
 		return rc;
@@ -614,10 +628,12 @@ int co_get_board(struct cobalt *co, const char *board, struct cobalt_query **q)
 
 	fsvm_init(&vm);
 	fsvm_ldarg(&vm, 0, dstr(&co->path), dstrlen(&co->path));
-	fsvm_ldarg(&vm, 1, "/attr/board/", strlen("/attr/board/"));
+	fsvm_ldarg(&vm, 1, "/attr/", strlen("/attr/"));
 	fsvm_ldarg(&vm, 2, "data", strlen("data"));
 	fsvm_ldarg(&vm, 3, "attr/board", strlen("attr/board"));
-	fsvm_ldarg(&vm, 4, board, strlen(board));
+	fsvm_ldarg(&vm, 4, value, strlen(value));
+	fsvm_ldarg(&vm, 5, attr, strlen(attr));
+	fsvm_ldarg(&vm, 6, "/", strlen("/"));
 
 	rc = fsvm_run(&vm, get_board, lengthof(get_board));
 	if (rc == CO_ENOERR) {
