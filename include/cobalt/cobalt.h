@@ -51,6 +51,10 @@ CO_API void co_free(struct cobalt *co);
 CO_API uint32_t co_add(struct cobalt *co, const char *data, size_t len,
 		const char *board);
 
+/* add a new attribute to an existing task */
+CO_API int co_add_attr(struct cobalt *co, uint32_t id, const char *name,
+		const char *val);
+
 /* modify an existing attribute */
 CO_API int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
 		const char *newval);

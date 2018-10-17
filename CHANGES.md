@@ -7,6 +7,7 @@ All changes between releases will be documented in this file.
    configuration parsing.
  - Output terminal color codes for the show command, when enabled in the config
    file.
+ - Interface for directly manipulating attributes with the API.
 
 ### Changed
  - Eliminated dependency on Perl for build and tests.

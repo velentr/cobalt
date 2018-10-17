@@ -302,44 +302,101 @@ int co_mod_data(struct cobalt *co, uint32_t id, const char *data, size_t len)
 	return rc;
 }
 
+static int co_do_add_attr(struct cobalt *co, const char *sid, const char *name,
+		const char *val)
+{
+	struct fsvm vm;
+	const struct fsvm_op add_attr[] = {
+		OP_ACAT(0, 0),	/* r0 <- ".cobalt" */
+		OP_RCAT(2, 0),	/* r2 <- ".cobalt" */
+		OP_ACAT(0, 1),	/* r0 <- ".cobalt/attr/" */
+		OP_ACAT(0, 2),	/* r0 <- ".cobalt/attr/<name>" */
+		OP_ACAT(0, 3),	/* r0 <- ".cobalt/attr/<name>/" */
+		OP_DEX(0),	/* dex ".cobalt/attr/<name>/" */
+		OP_ACAT(0, 4),	/* r0 <- ".cobalt/attr/<name>/<val> */
+		OP_ACAT(0, 3),	/* r0 <- ".cobalt/attr/<name>/<val>/ */
+		OP_DEX(0),	/* dex ".cobalt/attr/<name>/<val>/ */
+		OP_ACAT(0, 5),	/* r0 <- ".cobalt/attr/<name>/<val>/<id> */
+
+		OP_ACAT(1, 8),	/* r1 <- "../../../obj/" */
+		OP_ACAT(1, 5),	/* r1 <- "../../../obj/<id>" */
+
+		OP_ACAT(2, 7),	/* r2 <- ".cobalt/obj/" */
+		OP_ACAT(2, 5),	/* r2 <- ".cobalt/obj/<id>" */
+		OP_ACAT(2, 1),	/* r2 <- ".cobalt/obj/<id>/attr/" */
+		OP_ACAT(2, 2),	/* r2 <- ".cobalt/obj/<id>/attr/<name>" */
+
+		OP_ACAT(3, 10),	/* r3 <- "../../../attr/" */
+		OP_ACAT(3, 2),	/* r3 <- "../../../attr/<name>" */
+		OP_ACAT(3, 3),	/* r3 <- "../../../attr/<name>/" */
+		OP_ACAT(3, 4),	/* r3 <- "../../../attr/<name>/<val>" */
+
+		OP_LNK(1, 0),	/* ln ../../../obj/<id>
+					.cobalt/attr/<name>/<val>/<id> */
+		OP_LNK(3, 2),	/* ln ../../../attr/<name>/<val>
+					.cobalt/obj/<id>/attr/<name> */
+	};
+	int rc;
+
+	fsvm_init(&vm);
+	fsvm_ldarg(&vm,  0, dstr(&co->path), dstrlen(&co->path));
+	fsvm_ldarg(&vm,  1, "/attr/", strlen("/attr/"));
+	fsvm_ldarg(&vm,  2, name, strlen(name));
+	fsvm_ldarg(&vm,  3, "/", strlen("/"));
+	fsvm_ldarg(&vm,  4, val, strlen(val));
+	fsvm_ldarg(&vm,  5, sid, CO_ID_STRLEN);
+	fsvm_ldarg(&vm,  7, "/obj/", strlen("/obj/"));
+	fsvm_ldarg(&vm,  8, "../../../obj/", strlen("../../../obj/"));
+	fsvm_ldarg(&vm, 10, "../../../attr/", strlen("../../../attr/"));
+
+	rc = fsvm_run(&vm, add_attr, lengthof(add_attr));
+
+	fsvm_clear(&vm);
+
+	return rc;
+}
+
 static int co_do_mod_attr(struct cobalt *co, const char *sid, const char *name,
 		const char *newval)
 {
 	struct fsvm vm;
 	const struct fsvm_op mod_attr[] = {
-		OP_ACAT(0, 0),
-		OP_RCAT(1, 0),
-		OP_ACAT(0, 1),
-		OP_ACAT(0, 2),
-		OP_ACAT(0, 3),
-		OP_DEX(0),
-		OP_ACAT(0, 4),
-		OP_ACAT(0, 3),
-		OP_DEX(0),
-		OP_ACAT(0, 5),
+		OP_ACAT(0, 0),	/* r0 <- ".cobalt" */
+		OP_RCAT(1, 0),	/* r1 <- ".cobalt" */
+		OP_ACAT(0, 1),	/* r0 <- ".cobalt/attr/" */
+		OP_ACAT(0, 2),	/* r0 <- ".cobalt/attr/<name>" */
+		OP_ACAT(0, 3),	/* r0 <- ".cobalt/attr/<name>/" */
+		OP_DEX(0),	/* dex ".cobalt/attr/<name>/" */
+		OP_ACAT(0, 4),	/* r0 <- ".cobalt/attr/<name>/<val> */
+		OP_ACAT(0, 3),	/* r0 <- ".cobalt/attr/<name>/<val>/ */
+		OP_DEX(0),	/* dex ".cobalt/attr/<name>/<val>/ */
+		OP_ACAT(0, 5),	/* r0 <- ".cobalt/attr/<name>/<val>/<id> */
 
-		OP_ACAT(1, 7),
-		OP_ACAT(1, 5),
-		OP_RCAT(3, 1),
-		OP_ACAT(1, 1),
-		OP_ACAT(1, 2),
-		OP_RCAT(4, 1),
-		OP_ACAT(1, 6),
-		OP_ACAT(1, 5),
+		OP_ACAT(1, 7),	/* r1 <- ".cobalt/obj/" */
+		OP_ACAT(1, 5),	/* r1 <- ".cobalt/obj/<id>" */
+		OP_RCAT(3, 1),	/* r3 <- ".cobalt/obj/<id>" */
+		OP_ACAT(1, 1),	/* r1 <- ".cobalt/obj/<id>/attr/" */
+		OP_ACAT(1, 2),	/* r1 <- ".cobalt/obj/<id>/attr/<name>" */
+		OP_RCAT(4, 1),	/* r4 <- ".cobalt/obj/<id>/attr/<name>" */
+		OP_ACAT(1, 6),	/* r1 <- ".cobalt/obj/<id>/attr/<name>/" */
+		OP_ACAT(1, 5),	/* r1 <- ".cobalt/obj/<id>/attr/<name>/<id>" */
 
-		OP_ACAT(2, 8),
-		OP_ACAT(2, 5),
-		OP_ACAT(3, 9),
+		OP_ACAT(2, 8),	/* r2 <- "../../../obj/" */
+		OP_ACAT(2, 5),	/* r2 <- "../../../obj/<id>" */
+		OP_ACAT(3, 9),	/* r3 <- ".cobalt/obj/<id>/tmp" */
 
-		OP_ACAT(5, 10),
-		OP_ACAT(5, 2),
-		OP_ACAT(5, 6),
-		OP_ACAT(5, 4),
+		OP_ACAT(5, 10),	/* r5 <- "../../../attr/" */
+		OP_ACAT(5, 2),	/* r5 <- "../../../attr/<name>" */
+		OP_ACAT(5, 6),	/* r5 <- "../../../attr/<name>/" */
+		OP_ACAT(5, 4),	/* r5 <- "../../../attr/<name>/<val>" */
 
-		OP_LNK(2, 0),
-		OP_DLNK(2, 1),
-		OP_LNK(5, 3),
-		OP_FMV(3, 4),
+		OP_LNK(2, 0),	/* ln ../../../obj/<id>
+					.cobalt/attr/<name>/<val>/<id> */
+		OP_DLNK(2, 1),	/* rm .cobalt/obj/<id>/attr/<name>/<id> */
+		OP_LNK(5, 3),	/* ln ../../../attr/<name>/<val>
+					.cobalt/obj/<id>/tmp */
+		OP_FMV(3, 4),	/* mv .cobalt/obj/<id>/tmp
+					.cobalt/obj/<id>/attr/<name> */
 	};
 	int rc;
 
@@ -360,6 +417,35 @@ static int co_do_mod_attr(struct cobalt *co, const char *sid, const char *name,
 
 	fsvm_clear(&vm);
 
+	return rc;
+}
+
+int co_add_attr(struct cobalt *co, uint32_t id, const char *name,
+		const char *val)
+{
+	char sid[CO_ID_STRLEN + 2];
+	int rc;
+
+	/* validate user input */
+	rc = co_validate_attr(name);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+	rc = co_validate_attr(val);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+	if (id == 0) {
+		co->err = EINVAL;
+		return EINVAL;
+	}
+
+	snprintf(sid, lengthof(sid), "%08x/", id);
+
+	rc = co_do_add_attr(co, sid, name, val);
+	co->err = rc;
 	return rc;
 }
 
