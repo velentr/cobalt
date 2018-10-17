@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# Run a single command, under valgrind if necesary, with the correct LD_PRELOAD
+# Run a single command, under valgrind if necesary, with the correct
+# LD_LIBRARY_PATH to load the proper libcobalt.so
 run_command() {
 	if [ -z $V ]; then
-		env LD_PRELOAD=${lib} $@ 2>&1
+		env LD_LIBRARY_PATH=${libdir} $@ 2>&1
 	else
-		env LD_PRELOAD=${lib} \
+		env LD_LIBRARY_PATH=${libdir} \
 			valgrind \
 			--error-exitcode=2 \
 			--leak-check=full \
@@ -93,15 +94,12 @@ usage() {
 	echo "usage: $0 [-f <fixture>] [-l <library>] [-r] [-v] <cotest>" 1>&2
 }
 
-L='libcobalt.so'
 F='.cotest'
 O='.cotest/stdout'
 R=''
 V=''
-while getopts 'f:l:o:rv' opt; do
+while getopts 'f:o:rv' opt; do
 	case $opt in
-	l)	L="$OPTARG"
-		;;
 	f)	F="$OPTARG"
 		;;
 	o)	O="$OPTARG"
@@ -118,7 +116,7 @@ shift $(($OPTIND - 1))
 
 cotest="$PWD/$1"
 output="$PWD/$O"
-lib="$PWD/$L"
+libdir="$PWD"
 cobalt="$PWD/cobalt"
 
 if [ ! -z $R ]; then
