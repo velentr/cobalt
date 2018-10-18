@@ -3,16 +3,31 @@
  */
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#include <sys/random.h>
+#include <unistd.h>
 
 #include "random.h"
 
 void co_rng_init(struct co_rng *rng)
 {
 	rng->lfsr = 0;
+}
+
+static ssize_t co_getrandom(void *buf, size_t buflen)
+{
+	ssize_t size;
+	int fd;
+
+	fd = open("/dev/urandom", O_RDONLY);
+	if (fd < 0)
+		return -1;
+
+	size = read(fd, buf, buflen);
+	close(fd);
+
+	return size;
 }
 
 static int co_rng_seed(struct co_rng *rng)
@@ -22,7 +37,7 @@ static int co_rng_seed(struct co_rng *rng)
 
 	seed = getenv("COBALT_SEED");
 	if (seed == NULL) {
-		size = getrandom(&rng->lfsr, sizeof(rng->lfsr), 0);
+		size = co_getrandom(&rng->lfsr, sizeof(rng->lfsr));
 		if (size < 0) {
 			return errno;
 		} else if (size != sizeof(rng->lfsr) || rng->lfsr == 0) {

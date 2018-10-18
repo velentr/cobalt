@@ -14,7 +14,7 @@ used.
 ### Build-time
  - ragel FSM compiler
  - GCC-compatible C compiler
- - glibc (2.25 or newer)
+ - glibc
  - GNU make
  - Asciidoc (for building documentation)
 
