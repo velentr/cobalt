@@ -12,6 +12,9 @@ All changes between releases will be documented in this file.
 ### Changed
  - Eliminated dependency on Perl for build and tests.
 
+### Fixed
+ - Correctly report an error when `COBALT_SEED` is set to a zero value.
+
 ## 0.3.2 (2018/09/25)
 ### Fixed
  - Corrected return value in dstring allocation failures to use `errno` instead
