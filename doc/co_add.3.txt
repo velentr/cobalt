@@ -63,6 +63,18 @@ it fails to create the new task, 0 is returned (0 is not a valid task ID).
 **co_delete**() and **co_gc**() return 'CO_ENOERR' on success, or a different
 error code on failure.
 
+ENVIRONMENT VARIABLES
+---------------------
+
+The *COBALT_SEED* environment variable, if set to an integer, is used to seed
+the PRNG used for generating IDs. If the environment variable is not set, the
+seed is pulled from '/dev/urandom'. If the environment variable is set to an
+invalid value (i.e. a string or a zero value), then creation of the task will
+fail.
+
+This functionality should only be used for testing; the default behavior will
+likely suffice for most cases.
+
 VERSIONS
 --------
 **co_add**(), **co_delete**(), and **co_gc**() were added to 'cobalt' in version

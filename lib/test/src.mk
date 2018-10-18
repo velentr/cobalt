@@ -9,5 +9,6 @@ test += $(dir)/lib-open-dstrcat-fail
 test += $(dir)/lib-open-dstrcpy-fail
 test += $(dir)/lib-open-malloc-fail
 test += $(dir)/lib-seed-rng
+test += $(dir)/lib-seed-zero
 
 cover += lib/cobalt lib/fsvm

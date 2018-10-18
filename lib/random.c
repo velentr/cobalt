@@ -38,17 +38,15 @@ static int co_rng_seed(struct co_rng *rng)
 	seed = getenv("COBALT_SEED");
 	if (seed == NULL) {
 		size = co_getrandom(&rng->lfsr, sizeof(rng->lfsr));
-		if (size < 0) {
+		if (size < 0)
 			return errno;
-		} else if (size != sizeof(rng->lfsr) || rng->lfsr == 0) {
+		else if (size != sizeof(rng->lfsr) || rng->lfsr == 0)
 			rng->lfsr = 0;
-			return EAGAIN;
-		}
 	} else {
 		rng->lfsr = strtoul(seed, NULL, 10);
 	}
 
-	return 0;
+	return rng->lfsr == 0 ? EAGAIN : 0;
 }
 
 uint32_t co_getrandomid(struct co_rng *rng, int *err)
