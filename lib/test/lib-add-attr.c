@@ -6,7 +6,9 @@
 
 #define TEST_DATA	"This is a test"
 
-/* Sanity check to ensure co_init() is working */
+/* Verify that we can set an attribute and query the added task by that
+ * attribute.
+ */
 int main()
 {
 	struct cobalt *co;
