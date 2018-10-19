@@ -88,7 +88,7 @@ $(cli): $(cliobj) $(obj) | $(lib)
 
 $(lib): $(libobj) $(obj)
 	@echo "LIB	$@"
-	$(CC) -shared $^ -o $@
+	$(CC) -shared $^ $(LDFLAGS) -o $@
 
 %.c: %.rl
 	@echo "RL	$*"
