@@ -66,6 +66,9 @@ CO_API int co_mod_data(struct cobalt *co, uint32_t id, const char *data,
 /* delete an existing cobalt entry */
 CO_API int co_delete(struct cobalt *co, uint32_t id, uint32_t flags);
 
+/* delete an attribute from a task */
+CO_API int co_del_attr(struct cobalt *co, uint32_t id, const char *attr);
+
 /* run garbage collection on the cobalt task database */
 CO_API int co_gc(struct cobalt *co, uint32_t flags);
 

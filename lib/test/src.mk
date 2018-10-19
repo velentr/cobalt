@@ -1,6 +1,7 @@
 dir := lib/test
 
 test += $(dir)/lib-add-attr
+test += $(dir)/lib-del-attr
 test += $(dir)/lib-init
 test += $(dir)/lib-init-exists
 test += $(dir)/lib-init-malloc-fail

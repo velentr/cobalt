@@ -237,6 +237,22 @@ static int fsvm_run_fmv(struct fsvm *vm, uint8_t old, uint8_t new)
 		return CO_ENOERR;
 }
 
+static int fsvm_run_frm(struct fsvm *vm, uint8_t file)
+{
+	const char *filename;
+	int rc;
+
+	assert(vm != NULL);
+	assert(file < FSVM_NUM_REGS);
+
+	filename = dstr(&vm->reg[file]);
+	rc = unlink(filename);
+	if (rc == -1)
+		return errno;
+	else
+		return CO_ENOERR;
+}
+
 static int fsvm_run_lnk(struct fsvm *vm, uint8_t targ, uint8_t name)
 {
 	const char *target;
@@ -545,6 +561,9 @@ static int fsvm_run_one(struct fsvm *vm, const struct fsvm_op *op)
 	case FSVM_FMV:
 		rc = fsvm_run_fmv(vm, op->x, op->y);
 		break;
+	case FSVM_FRM:
+		rc =fsvm_run_frm(vm, op->x);
+		break;
 	case FSVM_LNK:
 		rc = fsvm_run_lnk(vm, op->x, op->y);
 		break;
@@ -597,6 +616,7 @@ static void fsvm_revert_one(struct fsvm *vm, const struct fsvm_op *op)
 	assert(op->type < FSVM_NUM_OPS);
 	assert(op->type != FSVM_ABORT);
 	assert(op->type != FSVM_FMV);
+	assert(op->type != FSVM_FRM);
 
 	switch (op->type) {
 	case FSVM_DMK:

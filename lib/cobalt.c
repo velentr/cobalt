@@ -356,6 +356,44 @@ static int co_do_add_attr(struct cobalt *co, const char *sid, const char *name,
 	return rc;
 }
 
+static int co_do_del_attr(struct cobalt *co, const char *sid, const char *attr)
+{
+	struct fsvm vm;
+	const struct fsvm_op add_attr[] = {
+		OP_ACAT(0, 0),	/* r0 <- .cobalt */
+		OP_ACAT(0, 1),	/* r0 <- .cobalt/obj/ */
+		OP_ACAT(0, 2),	/* r0 <- .cobalt/obj/<id> */
+		OP_ACAT(0, 3),	/* r0 <- .cobalt/obj/<id>/attr/ */
+		OP_ACAT(0, 4),	/* r0 <- .cobalt/obj/<id>/attr/<attr> */
+		OP_RCAT(1, 0),	/* r1 <- .cobalt/obj/<id>/attr/<attr> */
+		OP_ACAT(0, 5),	/* r0 <- .cobalt/obj/<id>/attr/<attr>/ */
+		OP_ACAT(0, 2),	/* r0 <- .cobalt/obj/<id>/attr/<attr>/<id> */
+
+		OP_ACAT(2, 6),	/* r2 <- ../../../obj/ */
+		OP_ACAT(2, 2),	/* r2 <- ../../../obj/<id> */
+
+		OP_DLNK(2, 0),	/* dln (../../../obj/<id>)
+					.cobalt/obj/<id>/attr/<attr>/<id> */
+		OP_FRM(1),	/* rm .cobalt/obj/<id>/attr/<attr> */
+	};
+	int rc;
+
+	fsvm_init(&vm);
+	fsvm_ldarg(&vm,  0, dstr(&co->path), dstrlen(&co->path));
+	fsvm_ldarg(&vm,  1, "/obj/", strlen("/obj/"));
+	fsvm_ldarg(&vm,  2, sid, CO_ID_STRLEN);
+	fsvm_ldarg(&vm,  3, "/attr/", strlen("/attr/"));
+	fsvm_ldarg(&vm,  4, attr, strlen(attr));
+	fsvm_ldarg(&vm,  5, "/", strlen("/"));
+	fsvm_ldarg(&vm,  6, "../../../obj/", strlen("../../../obj/"));
+
+	rc = fsvm_run(&vm, add_attr, lengthof(add_attr));
+
+	fsvm_clear(&vm);
+
+	return rc;
+}
+
 static int co_do_mod_attr(struct cobalt *co, const char *sid, const char *name,
 		const char *newval)
 {
@@ -432,6 +470,10 @@ int co_add_attr(struct cobalt *co, uint32_t id, const char *name,
 		co->err = rc;
 		return rc;
 	}
+	if (strcmp(name, "board") == 0) {
+		co->err = EINVAL;
+		return rc;
+	}
 	rc = co_validate_attr(val);
 	if (rc != CO_ENOERR) {
 		co->err = rc;
@@ -445,6 +487,33 @@ int co_add_attr(struct cobalt *co, uint32_t id, const char *name,
 	snprintf(sid, lengthof(sid), "%08x/", id);
 
 	rc = co_do_add_attr(co, sid, name, val);
+	co->err = rc;
+	return rc;
+}
+
+int co_del_attr(struct cobalt *co, uint32_t id, const char *attr)
+{
+	char sid[CO_ID_STRLEN + 2];
+	int rc;
+
+	/* validate user input */
+	rc = co_validate_attr(attr);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+	if (strcmp(attr, "board") == 0) {
+		co->err = EINVAL;
+		return rc;
+	}
+	if (id == 0) {
+		co->err = EINVAL;
+		return EINVAL;
+	}
+
+	snprintf(sid, lengthof(sid), "%08x/", id);
+
+	rc = co_do_del_attr(co, sid, attr);
 	co->err = rc;
 	return rc;
 }
