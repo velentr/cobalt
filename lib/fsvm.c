@@ -455,7 +455,7 @@ static int fsvm_run_rd(struct fsvm *vm, uint8_t name)
 	return fsvm_globname(vm, g, vm->arg[name].data, vm->arg[name].len);
 }
 
-static int fsvm_run_map(struct fsvm *vm, uint8_t reg, uint8_t name)
+static int fsvm_run_gmap(struct fsvm *vm, uint8_t reg, uint8_t name)
 {
 	struct stat sb;
 	struct list_elem *le;
@@ -511,7 +511,7 @@ static int fsvm_run_map(struct fsvm *vm, uint8_t reg, uint8_t name)
 	return rc;
 }
 
-static int fsvm_run_rdlnk(struct fsvm *vm, uint8_t reg, uint8_t name)
+static int fsvm_run_grdlnk(struct fsvm *vm, uint8_t reg, uint8_t name)
 {
 	/* include an extra byte for a canary */
 	char buf[FSVM_MAX_LNKTARG + 1];
@@ -538,6 +538,29 @@ static int fsvm_run_rdlnk(struct fsvm *vm, uint8_t reg, uint8_t name)
 	}
 
 	return CO_ENOERR;
+}
+
+static int fsvm_run_rrdlnk(struct fsvm *vm, uint8_t dst, uint8_t name)
+{
+	char buf[FSVM_MAX_LNKTARG + 1];
+	ssize_t len;
+	int rc;
+
+	assert(vm != NULL);
+	assert(dst < FSVM_NUM_REGS);
+	assert(name < FSVM_NUM_REGS);
+
+	len = readlink(dstr(&vm->reg[name]), buf, sizeof(buf));
+	if (len < 0)
+		return errno;
+	else if ((size_t)len == sizeof(buf))
+		return CO_ELIMIT;
+
+	rc = dstrcatl(&vm->reg[dst], buf, len);
+	if (rc < 0)
+		return rc;
+	else
+		return CO_ENOERR;
 }
 
 static int fsvm_run_one(struct fsvm *vm, const struct fsvm_op *op)
@@ -585,11 +608,14 @@ static int fsvm_run_one(struct fsvm *vm, const struct fsvm_op *op)
 	case FSVM_RD:
 		rc = fsvm_run_rd(vm, op->x);
 		break;
-	case FSVM_MAP:
-		rc = fsvm_run_map(vm, op->x, op->y);
+	case FSVM_GMAP:
+		rc = fsvm_run_gmap(vm, op->x, op->y);
 		break;
-	case FSVM_RDLNK:
-		rc = fsvm_run_rdlnk(vm, op->x, op->y);
+	case FSVM_GRDLNK:
+		rc = fsvm_run_grdlnk(vm, op->x, op->y);
+		break;
+	case FSVM_RRDLNK:
+		rc = fsvm_run_rrdlnk(vm, op->x, op->y);
 		break;
 	case FSVM_ABORT:
 		rc = CO_EABORT;
@@ -640,11 +666,12 @@ static void fsvm_revert_one(struct fsvm *vm, const struct fsvm_op *op)
 	case FSVM_LD:
 		fsvm_revert_ld(vm);
 		break;
-	case FSVM_GLOB:	/* fallthrough */
-	case FSVM_RD:	/* fallthrough */
-	case FSVM_MAP:	/* fallthrough */
-	case FSVM_RDLNK:/* fallthrough */
-	case FSVM_DEX:	/* fallthrough */
+	case FSVM_GLOB:		/* fallthrough */
+	case FSVM_RD:		/* fallthrough */
+	case FSVM_GMAP:		/* fallthrough */
+	case FSVM_GRDLNK:	/* fallthrough */
+	case FSVM_RRDLNK:	/* fallthrough */
+	case FSVM_DEX:		/* fallthrough */
 	case FSVM_NOP:
 		break;
 	default:

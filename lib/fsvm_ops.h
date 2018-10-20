@@ -19,8 +19,9 @@ enum {
 	FSVM_LD,	/* load a directory as an index */
 	FSVM_GLOB,	/* glob from the current index */
 	FSVM_RD,	/* read a single entry from the current index */
-	FSVM_MAP,	/* map relative to the glob */
-	FSVM_RDLNK,	/* read a link relative to the glob */
+	FSVM_GMAP,	/* map relative to the glob */
+	FSVM_GRDLNK,	/* read a link relative to the glob */
+	FSVM_RRDLNK,	/* read a link into a register */
 	FSVM_ABORT,	/* abort execution */
 	FSVM_NOP,	/* do nothing */
 
@@ -39,8 +40,9 @@ enum {
 #define OP_LD(path)		{ .type = FSVM_LD, .x = path, }
 #define OP_GLOB			{ .type = FSVM_GLOB, }
 #define OP_RD(name)		{ .type = FSVM_RD, .x = name, }
-#define OP_MAP(dst, name)	{ .type = FSVM_MAP, .x = dst, .y = name, }
-#define OP_RDLNK(dst, name)	{ .type = FSVM_RDLNK, .x = dst, .y = name, }
+#define OP_GMAP(dst, name)	{ .type = FSVM_GMAP, .x = dst, .y = name, }
+#define OP_GRDLNK(dst, name)	{ .type = FSVM_GRDLNK, .x = dst, .y = name, }
+#define OP_RRDLNK(dst, name)	{ .type = FSVM_RRDLNK, .x = dst, .y = name, }
 #define OP_ABORT		{ .type = FSVM_ABORT, }
 #define OP_NOP			{ .type = FSVM_NOP, }
 

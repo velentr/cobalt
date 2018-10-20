@@ -547,6 +547,69 @@ int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
 	return rc;
 }
 
+static int co_cp_attr(char *dst, const char *src, size_t len)
+{
+	if (strstr(src, "../../../attr/") != src)
+		return CO_ECORRUPT;
+
+	src += strlen("../../../attr/");
+	src = strchr(src, '/');
+	if (src == NULL)
+		return CO_ECORRUPT;
+	src++;
+	strncpy(dst, src, len);
+	if (dst[len-1] == '\0')
+		return CO_ENOERR;
+	else
+		return ENOBUFS;
+}
+
+int co_attr(struct cobalt *co, uint32_t id, const char *attr, char *buf,
+		size_t buflen)
+{
+	struct fsvm vm;
+	struct fsvm_op attrof[] = {
+		OP_ACAT(0, 0),	/* r0 <- .cobalt */
+		OP_ACAT(0, 1),	/* r0 <- .cobalt/obj/ */
+		OP_ACAT(0, 4),	/* r0 <- .cobalt/obj/<id> */
+		OP_ACAT(0, 3),	/* r0 <- .cobalt/obj/<id>/attr/ */
+		OP_ACAT(0, 5),	/* r0 <- .cobalt/obj/<id>/attr/<attr> */
+		OP_RRDLNK(1, 0),
+	};
+	char sid[CO_ID_STRLEN + 1];
+	int rc;
+
+	/* validate user input */
+	rc = co_validate_attr(attr);
+	if (rc != CO_ENOERR) {
+		co->err = rc;
+		return rc;
+	}
+	if (id == 0) {
+		co->err = EINVAL;
+		return EINVAL;
+	}
+
+	rc = snprintf(sid, lengthof(sid), "%08x", id);
+	assert(rc == CO_ID_STRLEN);
+
+	fsvm_init(&vm);
+	fsvm_ldarg(&vm, 0, dstr(&co->path), dstrlen(&co->path));
+	fsvm_ldarg(&vm, 1, "/obj/", strlen("/obj/"));
+	fsvm_ldarg(&vm, 3, "/attr/", strlen("/attr/"));
+	fsvm_ldarg(&vm, 4, sid, CO_ID_STRLEN);
+	fsvm_ldarg(&vm, 5, attr, strlen(attr));
+
+	rc = fsvm_run(&vm, attrof, lengthof(attrof));
+	if (rc == CO_ENOERR)
+		rc = co_cp_attr(buf, dstr(&vm.reg[1]), buflen);
+
+	co->err = rc;
+
+	fsvm_clear(&vm);
+	return rc;
+}
+
 int co_delete(struct cobalt *co, uint32_t id, uint32_t flags)
 {
 	struct fsvm vm;
@@ -626,8 +689,8 @@ int co_get_task(struct cobalt *co, uint32_t id, struct cobalt_query **q)
 		OP_ACAT(4, 4),
 		OP_LD(0),
 		OP_RD(4),
-		OP_MAP(CO_MAP_REG, 2),
-		OP_RDLNK(CO_BOARD_REG, 3),
+		OP_GMAP(CO_MAP_REG, 2),
+		OP_GRDLNK(CO_BOARD_REG, 3),
 	};
 	char sid[CO_ID_STRLEN + 1];
 	int rc;
@@ -678,8 +741,8 @@ int co_get_attr(struct cobalt *co, const char *attr, const char *value,
 		OP_ACAT(3, 3),	/* r3 <- "attr/board" */
 		OP_LD(0),	/* foreach .cobalt/attr/<attr>/<value>: */
 		OP_GLOB,
-		OP_MAP(CO_MAP_REG, 2),		/* map "data" */
-		OP_RDLNK(CO_BOARD_REG, 3),	/* readlink "attr/board" */
+		OP_GMAP(CO_MAP_REG, 2),		/* map "data" */
+		OP_GRDLNK(CO_BOARD_REG, 3),	/* readlink "attr/board" */
 	};
 	int rc;
 
@@ -726,8 +789,8 @@ int co_get_all(struct cobalt *co, struct cobalt_query **q)
 		OP_ACAT(3, 3),
 		OP_LD(0),
 		OP_GLOB,
-		OP_MAP(CO_MAP_REG, 2),
-		OP_RDLNK(CO_BOARD_REG, 3),
+		OP_GMAP(CO_MAP_REG, 2),
+		OP_GRDLNK(CO_BOARD_REG, 3),
 	};
 	int rc;
 

@@ -51,6 +51,13 @@ CO_API void co_free(struct cobalt *co);
 CO_API uint32_t co_add(struct cobalt *co, const char *data, size_t len,
 		const char *board);
 
+/* set the data for the given command */
+CO_API int co_mod_data(struct cobalt *co, uint32_t id, const char *data,
+		size_t len);
+
+/* delete an existing cobalt entry */
+CO_API int co_delete(struct cobalt *co, uint32_t id, uint32_t flags);
+
 /* add a new attribute to an existing task */
 CO_API int co_add_attr(struct cobalt *co, uint32_t id, const char *name,
 		const char *val);
@@ -59,15 +66,12 @@ CO_API int co_add_attr(struct cobalt *co, uint32_t id, const char *name,
 CO_API int co_mod_attr(struct cobalt *co, uint32_t id, const char *name,
 		const char *newval);
 
-/* set the data for the given command */
-CO_API int co_mod_data(struct cobalt *co, uint32_t id, const char *data,
-		size_t len);
-
-/* delete an existing cobalt entry */
-CO_API int co_delete(struct cobalt *co, uint32_t id, uint32_t flags);
-
 /* delete an attribute from a task */
 CO_API int co_del_attr(struct cobalt *co, uint32_t id, const char *attr);
+
+/* get the value for a given attribute for the task */
+CO_API int co_attr(struct cobalt *co, uint32_t id, const char *attr, char *buf,
+		size_t buflen);
 
 /* run garbage collection on the cobalt task database */
 CO_API int co_gc(struct cobalt *co, uint32_t flags);
