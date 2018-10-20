@@ -11,6 +11,7 @@
  */
 int main()
 {
+	char buf[8];
 	struct cobalt *co;
 	struct cobalt_query *q;
 	const char *data;
@@ -38,6 +39,13 @@ int main()
 	assert(memcmp(data, TEST_DATA, len) == 0);
 
 	assert(co_query_getnext(co, q) == NULL);
+
+	err = co_attr(co, id, "attribute", buf, sizeof(buf));
+	assert(err == CO_ENOERR);
+	assert(strcmp(buf, "value") == 0);
+
+	err = co_attr(co, id, "attribute", buf, 5);
+	assert(err != CO_ENOERR);
 
 	co_free(co);
 
