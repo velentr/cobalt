@@ -29,7 +29,7 @@ dorun() {
 		echo "$res"
 		exit $rc
 	else
-		echo PASS > $output
+		echo "PASS ($cmd)" >> $output
 	fi
 }
 
@@ -46,6 +46,8 @@ dofail() {
 		echo "Memory error detected for '${cmd}':"
 		echo "$res"
 		exit $rc
+	else
+		echo "PASS ($cmd)" >> $output
 	fi
 }
 
