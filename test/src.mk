@@ -19,6 +19,8 @@ test += $(dir)/dstring-set-long
 test += $(dir)/dstring-stack-to-heap-fail
 test += $(dir)/dstring-use-after-clear
 
+test += $(dir)/htable-insert-one
+
 test += $(dir)/list-add-one
 test += $(dir)/list-add-two
 test += $(dir)/list-cat
@@ -36,5 +38,5 @@ LDFLAGS_test := -Wl,--wrap=malloc,--wrap=realloc,--wrap=mkdir,--wrap=open
 LDFLAGS_test += -Wl,--wrap=write,--wrap=rename,--wrap=symlink,--wrap=unlink
 LDFLAGS_test += -Wl,--wrap=readdir,--wrap=openat,--wrap=fstat,--wrap=mmap
 
-cover += dstring list
+cover += dstring htable list
 
