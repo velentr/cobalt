@@ -3,15 +3,9 @@
  */
 
 #include <assert.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 #include "config.h"
 
@@ -69,42 +63,6 @@
 	main := eol* (sec (eol | kv)*)*;
 }%%
 
-/* XXX move open/fstat/mmap to common code */
-static int config_open(const char *file, const char **buf, size_t *len)
-{
-	struct stat st;
-	int fd;
-	int rc;
-
-	fd = open(file, O_RDONLY);
-	if (fd == -1)
-		return errno;
-
-	rc = fstat(fd, &st);
-	if (rc == -1) {
-		rc = errno;
-		close(fd);
-		return rc;
-	}
-
-	*len = st.st_size;
-	if (*len == 0) {
-		rc = errno;
-		close(fd);
-		return rc;
-	}
-
-	*buf = mmap(NULL, *len, PROT_READ, MAP_PRIVATE, fd, 0);
-	if (*buf == MAP_FAILED) {
-		rc = errno;
-		close(fd);
-		return rc;
-	}
-	close(fd);
-
-	return 0;
-}
-
 int conf_parse(const char *file)
 {
 	const char *buf;
@@ -117,7 +75,7 @@ int conf_parse(const char *file)
 	int cs;
 	int rc;
 
-	rc = config_open(file, &buf, &len);
+	rc = fmap(file, &buf, &len);
 	if (rc != 0)
 		return rc;
 	else if (len == 0)
@@ -136,7 +94,7 @@ int conf_parse(const char *file)
 		rc = 0;
 
 conf_error:
-	munmap(buf, len);
+	munmap((void *)buf, len);
 
 	return rc;
 
