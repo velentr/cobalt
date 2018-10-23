@@ -27,7 +27,7 @@ static void editstr_init(struct editstr *es)
 static void editstr_destroy(struct editstr *es)
 {
 	unlink(es->fname);
-	munmap((void *)es->data, es->len);
+	funmap(es->data, es->len);
 }
 
 int editstr_create(struct dstring *s, const char *template, size_t len)

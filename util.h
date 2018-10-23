@@ -32,6 +32,8 @@ static UNUSED void ignore(UNUSED int r) { }
 
 /* mmap() a file by its path */
 int fmap(const char *fname, const char **buf, size_t *len);
+/* munmap() a file (used mainly for debugging purposes) */
+void funmap(const char *buf, size_t len);
 
 #endif /* end of include guard: UTIL_H_ */
 

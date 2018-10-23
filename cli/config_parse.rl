@@ -94,7 +94,7 @@ int conf_parse(const char *file)
 		rc = 0;
 
 conf_error:
-	munmap((void *)buf, len);
+	funmap(buf, len);
 
 	return rc;
 

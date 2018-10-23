@@ -12,6 +12,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#if defined(CO_VALGRIND)
+#include <valgrind/valgrind.h>
+#else
+#define VALGRIND_MALLOCLIKE_BLOCK(addr, sizeB, rzB, is_zeroed)	(void)0
+#define VALGRIND_FREELIKE_BLOCK(addr, rzB)			(void)0
+#endif
+
 #include "util.h"
 
 int fmap(const char *fname, const char **buf, size_t *len)
@@ -48,8 +55,22 @@ int fmap(const char *fname, const char **buf, size_t *len)
 		close(fd);
 		return rc;
 	}
+
+	/* valgrind cannot track mmap()'d blocks, because there would be way too
+	 * many false positives mapped by the dynamic linker that the OS must
+	 * clean up; instead, we must manually tell valgrind to track an
+	 * mmap()'d block
+	 */
+	VALGRIND_MALLOCLIKE_BLOCK(*buf, *len, 0, 1);
+
 	close(fd);
 
 	return 0;
+}
+
+void funmap(const char *buf, size_t len)
+{
+	VALGRIND_FREELIKE_BLOCK(buf, 0);
+	munmap((void *)buf, len);
 }
 
