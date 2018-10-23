@@ -28,22 +28,27 @@
 	action startl { lstart = p; }
 
 	action setstr {
-		/* TODO check for error */
-		conf_adds(sname, slen, kname, klen, sval, p - sval - 1);
+		rc = conf_adds(sname, slen, kname, klen, sval, p - sval - 1);
+		if (rc != 0)
+			goto conf_error;
 	}
 
 	action setbooltrue {
-		/* TODO check for error */
-		conf_addb(sname, slen, kname, klen, 1);
+		rc = conf_addb(sname, slen, kname, klen, 1);
+		if (rc != 0)
+			goto conf_error;
 	}
 	action setboolfalse {
-		/* TODO check for error */
-		conf_addb(sname, slen, kname, klen, 0);
+		rc = conf_addb(sname, slen, kname, klen, 0);
+		if (rc != 0)
+			goto conf_error;
 	}
 
 	action setlong {
-		/* TODO check for error */
-		conf_addl(sname, slen, kname, klen, strtol(lstart, NULL, 0));
+		rc = conf_addl(sname, slen, kname, klen,
+				strtol(lstart, NULL, 0));
+		if (rc != 0)
+			goto conf_error;
 	}
 
 	nl = [\r\n];
@@ -126,8 +131,14 @@ int conf_parse(const char *file)
 	%% write exec;
 
 	if (cs == %%{ write error; }%%)
-		return EINVAL;
+		rc = EINVAL;
 	else
-		return 0;
+		rc = 0;
+
+conf_error:
+	munmap(buf, len);
+
+	return rc;
+
 }
 

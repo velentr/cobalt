@@ -14,6 +14,7 @@ All changes between releases will be documented in this file.
 
 ### Fixed
  - Correctly report an error when `COBALT_SEED` is set to a zero value.
+ - Fix error handling on allocation failure when parsing a config file.
 
 ## 0.3.2 (2018/09/25)
 ### Fixed
