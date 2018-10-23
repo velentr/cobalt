@@ -14,6 +14,7 @@
 #include <sys/types.h>
 
 #include "editstr.h"
+#include "util.h"
 
 static void editstr_init(struct editstr *es)
 {
@@ -21,42 +22,12 @@ static void editstr_init(struct editstr *es)
 	es->fname[0] = '\0';
 	es->data = MAP_FAILED;
 	es->len = 0;
-	es->fd = -1;
-}
-
-/* XXX move open/fstat/mmap to common code */
-static int editstr_map(const char *fname, struct editstr *es)
-{
-	struct stat st;
-	int rc;
-
-	es->fd = open(fname, O_RDONLY);
-	if (es->fd == -1)
-		return errno;
-
-	/* Get the file size for mmap() */
-	rc = fstat(es->fd, &st);
-	if (rc == -1)
-		return errno;
-	es->len = st.st_size;
-	if (es->len == 0)
-		return ECANCELED;
-
-	es->data = mmap(NULL, es->len, PROT_READ, MAP_PRIVATE, es->fd, 0);
-	if (es->data == MAP_FAILED)
-		return errno;
-
-	return 0;
 }
 
 static void editstr_destroy(struct editstr *es)
 {
-	if (es->fname[0] != '\0')
-		unlink(es->fname);
-	if (es->data != MAP_FAILED)
-		munmap(es->data, es->len);
-	if (es->fd != -1)
-		close(es->fd);
+	unlink(es->fname);
+	munmap((void *)es->data, es->len);
 }
 
 int editstr_create(struct dstring *s, const char *template, size_t len)
@@ -77,8 +48,7 @@ int editstr_create(struct dstring *s, const char *template, size_t len)
 
 	fd = mkstemp(fname);
 	if (fd == -1) {
-		rc = errno;
-		goto error_destroy;
+		return errno;
 	}
 	strcpy(es.fname, fname);
 
@@ -88,7 +58,7 @@ int editstr_create(struct dstring *s, const char *template, size_t len)
 		if (rc < 0) {
 			rc = errno;
 			close(fd);
-			goto error_destroy;
+			return rc;
 		}
 	}
 
@@ -99,17 +69,16 @@ int editstr_create(struct dstring *s, const char *template, size_t len)
 
 	rc = system(cmd);
 	if (rc != 0) {
-		rc = EINVAL;	/* TODO get a better error code here */
-		goto error_destroy;
+		return EINVAL;
 	}
 
-	rc = editstr_map(fname, &es);
+	rc = fmap(fname, &es.data, &es.len);
 	if (rc != 0)
-		goto error_destroy;
+		return rc;
 
 	rc = editstr_write(s, &es);
-error_destroy:
 	editstr_destroy(&es);
+
 	return rc;
 }
 

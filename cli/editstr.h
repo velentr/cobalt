@@ -16,7 +16,7 @@
 /* dynamic string created by an external text editor */
 struct editstr {
 	char fname[sizeof(EDITSTR_TMPFILE)];
-	char *data;
+	const char *data;
 	size_t len;
 	int fd;
 };
