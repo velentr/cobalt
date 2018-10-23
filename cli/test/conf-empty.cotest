@@ -1,0 +1,7 @@
+setup() {
+	touch .cobaltconfig
+}
+
+run_test() {
+	docobalt init
+}
