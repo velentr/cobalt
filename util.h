@@ -32,6 +32,8 @@ static UNUSED void ignore(UNUSED int r) { }
 
 /* mmap() a file by its path */
 int fmap(const char *fname, const char **buf, size_t *len);
+/* mmap() a file, by file descriptor and relative path */
+int fmapat(int dirfd, const char *fname, const char **buf, size_t *len);
 /* munmap() a file (used mainly for debugging purposes) */
 void funmap(const char *buf, size_t len);
 
