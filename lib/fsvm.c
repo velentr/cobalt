@@ -9,7 +9,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -457,11 +456,10 @@ static int fsvm_run_rd(struct fsvm *vm, uint8_t name)
 
 static int fsvm_run_gmap(struct fsvm *vm, uint8_t reg, uint8_t name)
 {
-	struct stat sb;
 	struct list_elem *le;
 	struct fsvm_glob *g;
-	char *map;
-	int fd;
+	const char *map;
+	size_t len;
 	int rc = CO_ENOERR;
 
 	assert(vm != NULL);
@@ -470,38 +468,20 @@ static int fsvm_run_gmap(struct fsvm *vm, uint8_t reg, uint8_t name)
 
 	list_foreach(le, &vm->globs) {
 		g = to_fsvm_glob(le);
-		fd = openat(g->fd, dstr(&vm->reg[name]), O_RDONLY);
-		if (fd == -1) {
-			rc = errno;
-			break;
-		}
 
-		rc = fstat(fd, &sb);
-		if (rc < 0) {
-			rc = errno;
-			close(fd);
-			break;
-		}
+		rc = fmapat(g->fd, dstr(&vm->reg[name]), &map, &len);
 
 		/* if the file is empty, then we are trying to append 0 bytes of
 		 * data to 'reg'; this is just a no-op, so we can skip the rest
 		 * of this iteration
 		 */
-		if (sb.st_size == 0) {
-			close(fd);
+		if (rc == ECANCELED && len == 0)
 			continue;
-		}
-
-		map = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-		if (map == MAP_FAILED) {
-			rc = errno;
-			close(fd);
+		else if (rc != 0)
 			break;
-		}
-		close(fd);
 
-		rc = dstrcatl(&g->reg[reg], map, sb.st_size);
-		munmap(map, sb.st_size);
+		rc = dstrcatl(&g->reg[reg], map, len);
+		funmap(map, len);
 		if (rc < 0)
 			break;
 
