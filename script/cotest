@@ -1,101 +1,5 @@
 #!/bin/bash
 
-# Run a single command, under valgrind if necesary, with the correct
-# LD_LIBRARY_PATH to load the proper libcobalt.so
-run_command() {
-	if [ -z $V ]; then
-		env LD_LIBRARY_PATH=${libdir} $@ 2>&1
-	else
-		env LD_LIBRARY_PATH=${libdir} \
-			valgrind \
-			--error-exitcode=2 \
-			--leak-check=full \
-			--show-leak-kinds=all \
-			--errors-for-leak-kinds=all \
-			--quiet \
-			$@ 2>&1
-	fi
-}
-
-# Execute a command, optionally under valgrind. If the command fails, exit and
-# print out the error.
-dorun() {
-	cmd="$@"
-	res=`run_command $@`
-	rc=$?
-
-	if [ $rc != 0 ]; then
-		echo "Running '${cmd}' failed:"
-		echo "$res"
-		exit $rc
-	else
-		echo "PASS ($cmd)" >> $output
-	fi
-}
-
-# Execute a command, exit and print an error if the command succeeds
-dofail() {
-	cmd="$@"
-	res=`run_command $@`
-	rc=$?
-
-	if [ $rc == 0 ]; then
-		echo "Running '${cmd}' succeeded (erroneously)"
-		exit 1
-	elif [ $rc == 2 ]; then
-		echo "Memory error detected for '${cmd}':"
-		echo "$res"
-		exit $rc
-	else
-		echo "PASS ($cmd)" >> $output
-	fi
-}
-
-# Run a cobalt command, using an absolute path to the cobalt binary
-docobalt() {
-	dorun $cobalt $@
-}
-
-# Run a cobalt command, expecting it to fail
-dofcobalt() {
-	dofail $cobalt $@
-}
-
-# Setup and teardown functions that may be overridden by the cotest script
-setup() {
-	return 0
-}
-teardown() {
-	return 0
-}
-
-# Set up and enter the test fixture
-setup_fixture() {
-	rm -rf ${F}
-	mkdir -p ${F}
-	pushd ${F} >/dev/null
-
-	setup
-}
-
-# Exit and tear down the test fixture
-teardown_fixture() {
-	teardown
-
-	popd >/dev/null
-	rm -rf ${F}
-}
-
-# Automatically fail the test if the run_test function is not overloaded
-run_test() {
-	echo 'no test procedure defined!' 1>&2
-	exit 1
-}
-
-usage() {
-	echo "usage: $0 [-f <fixture>] [-l <library>] [-r] [-v] <cotest>" 1>&2
-}
-
 F='.cotest'
 O='.cotest/stdout'
 R=''
@@ -117,18 +21,22 @@ done
 shift $(($OPTIND - 1))
 
 cotest="$PWD/$1"
-output="$PWD/$O"
 libdir="$PWD"
 cobalt="$PWD/cobalt"
 
-if [ ! -z $R ]; then
-	setup_fixture
-	dorun $cotest
-	teardown_fixture
+output=`env \
+	FIXTURE=$F \
+	VALGRIND=$V \
+	COTEST=$cotest \
+	LIBDIR=$libdir \
+	COBALT=$cobalt \
+	RUN=$R \
+	script/do-cotest 2>&1`
+rc=$?
+if [ $rc != 0 ]; then
+	echo "$output"
+	exit $rc
 else
-	source $cotest
-	setup_fixture
-	run_test
-	teardown_fixture
+	echo "$output" > $O
+	exit 0
 fi
-

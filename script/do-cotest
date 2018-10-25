@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Run a single command, under valgrind if necesary, with the correct
+# LD_LIBRARY_PATH to load the proper libcobalt.so
+run_command() {
+	if [ -z $VALGRIND ]; then
+		env LD_LIBRARY_PATH=${LIBDIR} $@
+	else
+		env LD_LIBRARY_PATH=${LIBDIR} \
+			valgrind \
+			--error-exitcode=2 \
+			--leak-check=full \
+			--show-leak-kinds=all \
+			--errors-for-leak-kinds=all \
+			--quiet \
+			$@
+	fi
+}
+
+# Execute a command, optionally under valgrind. If the command fails, exit and
+# print out the error.
+dorun() {
+	cmd="$@"
+	res=`run_command $@ 2>&1`
+	rc=$?
+
+	if [ $rc != 0 ]; then
+		echo "Running '${cmd}' failed:"
+		echo "$res"
+		exit $rc
+	else
+		echo "PASS ($cmd)"
+	fi
+}
+
+# Execute a command, exit and print an error if the command succeeds
+dofail() {
+	cmd="$@"
+	res=`run_command $@ 2>&1`
+	rc=$?
+
+	if [ $rc == 0 ]; then
+		echo "Running '${cmd}' succeeded (erroneously)"
+		exit 1
+	elif [ $rc == 2 ]; then
+		echo "Memory error detected for '${cmd}':"
+		echo "$res"
+		exit $rc
+	else
+		echo "PASS ($cmd)"
+	fi
+}
+
+# Run a cobalt command, using an absolute path to the cobalt binary
+docobalt() {
+	dorun $COBALT $@
+}
+
+# Run a cobalt command, expecting it to fail
+dofcobalt() {
+	dofail $COBALT $@
+}
+
+# Setup and teardown functions that may be overridden by the cotest script
+setup() {
+	return 0
+}
+teardown() {
+	return 0
+}
+
+# Set up and enter the test fixture
+setup_fixture() {
+	rm -rf ${FIXTURE}
+	mkdir -p ${FIXTURE}
+	pushd ${FIXTURE} >/dev/null
+
+	setup
+}
+
+# Exit and tear down the test fixture
+teardown_fixture() {
+	teardown
+
+	popd >/dev/null
+	rm -rf ${FIXTURE}
+}
+
+# Automatically fail the test if the run_test function is not overloaded
+run_test() {
+	echo 'no test procedure defined!'
+	exit 1
+}
+
+if [ ! -z $RUN ]; then
+	setup_fixture
+	dorun $COTEST
+	teardown_fixture
+else
+	source $COTEST
+	setup_fixture
+	run_test
+	teardown_fixture
+fi

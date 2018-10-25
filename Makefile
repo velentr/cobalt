@@ -106,7 +106,7 @@ $(lib): $(libobj) $(obj)
 	@echo "LD	$*"
 	$(CC) $^ -o $@ $(LDFLAGS_test) $(LDFLAGS)
 
-%.result: %.test script/cotest
+%.result: %.test script/cotest script/do-cotest
 	@echo "TEST	$*"
 	script/cotest -f .fixture/$* -r $(vlgnd) -o $@ $<
 
