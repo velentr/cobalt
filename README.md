@@ -9,7 +9,9 @@ Note that the API for the shared library is not yet stable, and should not be
 used.
 
 ## Dependencies
- - glibc (2.25 or newer)
+
+### Run-time
+ - glibc
 
 ### Build-time
  - ragel FSM compiler
