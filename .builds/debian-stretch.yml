@@ -1,0 +1,19 @@
+image: debian/stretch
+packages:
+        - gcc
+        - make
+        - asciidoc-base
+        - ragel
+        - valgrind
+sources:
+        - https://git.sr.ht/~bdk/cobalt
+tasks:
+        - build: |
+                cd cobalt
+                source ./debug.sh
+                make
+                make doc
+        - test: |
+                cd cobalt
+                source ./debug.sh
+                make VALGRIND=1 test
