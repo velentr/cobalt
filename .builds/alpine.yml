@@ -1,0 +1,18 @@
+image: alpine/edge
+packages:
+        - gcc
+        - make
+        - asciidoc
+        - ragel
+sources:
+        - https://git.sr.ht/~bdk/cobalt
+tasks:
+        - build: |
+                cd cobalt
+                source ./alpine-debug.sh
+                make
+                make doc
+        - test: |
+                cd cobalt
+                source ./alpine-debug.sh
+                make test
