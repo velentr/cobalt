@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export LD_LIBRARY_PATH='.'
-export CFLAGS='-O0 -g -DCO_VALGRIND'
+export CFLAGS='-O0 -g'
 export LDFLAGS=''
 export RLFLAGS=''
 
